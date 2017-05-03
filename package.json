@@ -1,6 +1,6 @@
 {
   "name": "nsyslog-parser",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Syslog Parser. Accepts RFC 3164 (BSD) and RFC 5424 formats",
   "author": "David Gómez Matarrodona <solzimer@gmail.com>",
   "url": "https://github.com/owner/project/issues",
