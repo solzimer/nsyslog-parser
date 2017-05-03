@@ -61,6 +61,7 @@ function parse(line) {
 			entry.ts = moment(month+" "+day+" "+time,"MMM DD HH:mm:ss").toDate();
 		}
 		else {
+			entry.type = "UNKNOWN";
 			items.unshift(item.trim());
 		}
 		endparse = true;
@@ -85,11 +86,19 @@ function parse(line) {
 				endparse = true;
 			}
 			else {
-				var r = assign(entry,item.replace(/: $/,"").trim())
-				if(r) {
+				// Invalid item (malformed message)
+				if(item.match(/[^a-zA-Z0-9\.\$\-_#%\/]/)) {
 					items.unshift(item);
 					entry.message = items.join(" ");
 					endparse = true;
+				}
+				else {
+					var r = assign(entry,item.replace(/: $/,"").trim())
+					if(r) {
+						items.unshift(item);
+						entry.message = items.join(" ");
+						endparse = true;
+					}
 				}
 			}
 		}
