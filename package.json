@@ -1,0 +1,10 @@
+{
+  "name": "nsyslog-parser",
+  "version": "0.0.1",
+  "description": "Syslog Parser. Accepts RFC 3164 (BSD) and RFC 5424 formats",
+  "author": "David Gómez Matarrodona <solzimer@grupoica.com>",
+  "main": "parser.js",
+  "dependencies": {
+    "moment": "^2.15.1",
+  }
+}
