@@ -9,6 +9,6 @@
 	"license" : "MIT",
 	"repository" : "solzimer/nsyslog-parser",
   "dependencies": {
-    "moment": "^2.15.1",
+    "moment": "^2.15.1"
   }
 }
