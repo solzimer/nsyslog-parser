@@ -2,8 +2,12 @@
   "name": "nsyslog-parser",
   "version": "0.0.1",
   "description": "Syslog Parser. Accepts RFC 3164 (BSD) and RFC 5424 formats",
-  "author": "David Gómez Matarrodona <solzimer@grupoica.com>",
+  "author": "David Gómez Matarrodona <solzimer@gmail.com>",
+	"url" : "https://github.com/owner/project/issues",
+	"email" : "solzimer@gmail.com",
   "main": "parser.js",
+	"license" : "MIT",
+	"repository" : "solzimer/nsyslog-parser",
   "dependencies": {
     "moment": "^2.15.1",
   }
