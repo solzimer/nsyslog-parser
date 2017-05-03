@@ -30,6 +30,10 @@ function parse(line) {
 		entry.pri = pri[0];
 		entry.prival = parseInt(entry.pri.match(RXS.prival)[1]);
 	}
+	else {
+		entry.pri = "";
+		entry.prival = NaN;
+	}
 
 	//Split message
 	var items = line.substring(entry.pri.length).split(" ");
