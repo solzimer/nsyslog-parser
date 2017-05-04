@@ -5,7 +5,7 @@ Syslog Parser. Accepts [RFC 3164 (BSD)](https://tools.ietf.org/search/rfc3164) a
 
     npm install nsyslog-parser
 
-**Use**
+**Usage**
 ```javascript
 const parser = require("nsyslog-parser");
 
@@ -16,12 +16,16 @@ console.log(parser(bsdLine);
 console.log(parser(ietfLine);
 ```
 
-**Result**
+**Results**
 ```javascript
   {
-    originalMessage: '<34>Oct 11 22:14:15 mymachine su: \'su root\' failed for lonvick on /dev/pts/8',
+  originalMessage: '<34>Oct 11 22:14:15 mymachine su: \'su root\' failed for lonvick on /dev/pts/8',
 	pri: '<34>',
 	prival: 34,
+	facilityval: 4,
+	levelval: 2,
+	facility: 'auth',
+	level: 'crit',
 	type: 'BSD',
 	ts: '2017-10-11T20:14:15.000Z',
 	host: 'mymachine',
@@ -34,6 +38,10 @@ console.log(parser(ietfLine);
 	originalMessage: '<34>1 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - BOM\'su root\' failed for lonvick on /dev/pts/8',
 	pri: '<34>',
 	prival: 34,
+	facilityval: 4,
+	levelval: 2,
+	facility: 'auth',
+	level: 'crit',
 	version: 1,
 	type: 'RFC5424',
 	ts: '2003-10-11T22:14:15.003Z',

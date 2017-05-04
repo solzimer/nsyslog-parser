@@ -1,4 +1,6 @@
-const moment = require("moment");
+const
+	moment = require("moment"),
+	Pri = require("./pri.js");
 
 const RXS = {
 	"pri" : /^<\d+>/,
@@ -29,6 +31,11 @@ function parse(line) {
 	if(pri) {
 		entry.pri = pri[0];
 		entry.prival = parseInt(entry.pri.match(RXS.prival)[1]);
+		var prival = Pri.get(entry.prival);
+		entry.facilityval = prival.facility;
+		entry.levelval = prival.level;
+		entry.facility = Pri.FACILITY[prival.facility].id;
+		entry.level = Pri.LEVEL[prival.level].id;
 	}
 	else {
 		entry.pri = "";
