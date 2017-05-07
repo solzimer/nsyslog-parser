@@ -51,16 +51,16 @@ console.log(parser(ietfLine);
 	messageid: 'ID47',
 	structuredData: '-',
 	message: 'BOM\'su root\' failed for lonvick on /dev/pts/8',
-    structuredData:
-    [
-      {'$id': 'exampleSDID@32473',
-      iut: '3',
-      eventSource: 'Application',
-      eventID: '1011' },
-      {'$id': 'exampleSDID@32474',
-      iut: '4',
-      eventSource: 'Application',
-      eventID: '1012' } ]
+	structuredData:
+	[
+		{'$id': 'exampleSDID@32473',
+		iut: '3',
+		eventSource: 'Application',
+		eventID: '1011' },
+		{'$id': 'exampleSDID@32474',
+		iut: '4',
+		eventSource: 'Application',
+		eventID: '1012' } ]
 	fields: [],
 	header: '<34>1 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - '
 }
