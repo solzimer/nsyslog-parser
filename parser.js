@@ -10,6 +10,7 @@ const RXS = {
 	"day" : /^\d{1,2} /,
 	"time" : /^\d+:\d+:\d+ /,
 	"ts" : /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\S+ /,
+	"invalid" : /[^a-zA-Z0-9\.\$\-_#%\/]/,
 	"sdata" : /\[(\S+)( [^\=]+\=\"[^\"]+\")+\]/g,
 }
 
@@ -98,7 +99,7 @@ function parse(line) {
 			}
 			else {
 				// Invalid item (malformed message)
-				if(item.match(/[^a-zA-Z0-9\.\$\-_#%\/]/)) {
+				if(item.match(RXS.invalid)) {
 					items.unshift(item);
 					entry.message = items.join(" ");
 					endparse = true;
