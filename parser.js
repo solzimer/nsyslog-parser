@@ -10,6 +10,7 @@ const RXS = {
 	"day" : /^\d{1,2} /,
 	"time" : /^\d+:\d+:\d+ /,
 	"ts" : /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\S+ /,
+	"sdata" : /\[(\S+)( [^\=]+\=\"[^\"]+\")+\]/g,
 }
 
 function assign(entry,item) {
@@ -74,6 +75,9 @@ function parse(line) {
 		endparse = true;
 	}
 
+	// No timestamp
+	if(!entry.ts) entry.ts = new Date();
+
 	// Is a standard syslog message
 	if(entry.type) {
 		endparse = false;
@@ -115,6 +119,25 @@ function parse(line) {
 	}
 
 	// Structured data
+	if(entry.type=="RFC5424") {
+		var sdata = entry.message.match(RXS.sdata) || [];
+		var idx=0;
+		entry.structuredData = sdata.map(item=>{
+			var map = {};
+			idx = entry.message.indexOf(item)+item.length+1;
+			item.replace(/(^\[)|(\]$)/g,"").split(" ").map((t,i)=>{
+				if(i==0) return {key:"$id",val:t};
+				else {
+					var kv = t.split("=");
+					return {key:kv[0],val:(kv[1]||"").replace(/\"/g,"")};
+				}
+			}).forEach(kv=>map[kv.key]=kv.val);
+			return map;
+		});
+		entry.message = entry.message.substring(idx);
+	}
+
+	// Message with fields
 	var fields = [];
 	entry.message.split(",").forEach(kv=>{
 		var prop = kv.split("=");
@@ -129,4 +152,4 @@ function parse(line) {
 	return entry;
 }
 
-module.exports = function(line) {try {return parse(line)}catch(err){return {}}};
+module.exports = function(line) {try {return parse(line)}catch(err){return {err:err}}};
