@@ -45,7 +45,7 @@ function parse(line) {
 	}
 
 	//Split message
-	var items = line.substring(entry.pri.length).split(" ");
+	var items = line.substring(entry.pri.length).split(" ").filter(i=>i.trim().length);
 
 	// Date search
 	var endparse = false;
