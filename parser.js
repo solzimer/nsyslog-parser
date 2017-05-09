@@ -14,6 +14,16 @@ const RXS = {
 	"sdata" : /\[(\S+)( [^\=]+\=\"[^\"]+\")+\]/g,
 }
 
+Array.prototype.peek = function() {
+	do {
+		var item = this.shift();
+		if(item===undefined) return item;
+		else item = item.trim();
+	}while(!item);
+
+	return item;
+}
+
 function assign(entry,item) {
 	if(!entry.host) entry.host = item.trim();
 	else if(!entry.appName) entry.appName = item.trim();
@@ -45,18 +55,18 @@ function parse(line) {
 	}
 
 	//Split message
-	var items = line.substring(entry.pri.length).split(" ").filter(i=>i.trim().length);
+	var items = line.substring(entry.pri.length).split(" ");
 
 	// Date search
 	var endparse = false;
 	while(line.length && !endparse) {
-		var item = items.shift()+" ";
+		var item = items.peek()+" ";
 
 		// RFC RFC5424
 		if(item.match(RXS.prinmr)) {
 			entry.version = parseInt(item);
 			entry.type = "RFC5424";
-			item = items.shift()+" ";
+			item = items.peek()+" ";
 			if(item.match(RXS.ts)) {
 				entry.ts = moment(item.match(RXS.ts)[0].trim()).toDate();
 			}
@@ -65,8 +75,8 @@ function parse(line) {
 		else if(item.match(RXS.month)) {
 			entry.type = "BSD";
 			var month = item.trim();
-			var day = items.shift();
-			var time = items.shift();
+			var day = items.peek();
+			var time = items.peek();
 			entry.ts = moment(month+" "+day+" "+time,"MMM DD HH:mm:ss").toDate();
 		}
 		else {
@@ -83,7 +93,7 @@ function parse(line) {
 	if(entry.type) {
 		endparse = false;
 		while(line.length && !endparse) {
-			var item = items.shift();
+			var item = items.peek();
 			if(!item) {
 				endparse = true;
 			}
@@ -92,7 +102,7 @@ function parse(line) {
 				entry.message = items.join(" ");
 				endparse = true;
 			}
-			else if(items.length==1) {
+			else if(!items.length) {
 				items.unshift(item);
 				entry.message = items.join(" ");
 				endparse = true;

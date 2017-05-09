@@ -10,10 +10,14 @@ const MSGS = [
 	'<189>192.168.26.254 time=16:31:28 devname=FG600B3909601440 devid=FG600B3909601440 logid=0000000013 type=traffic subtype=forward level=notice vd=VDOM-SNOC srcip=192.168.22.68 srcport=51448 srcintf="port3" dstip=216.58.210.174 dstport=443 dstintf="port7" sessionid=128625552 proto=6 action=close policyid=39 dstcountry="United States" srccountry="Reserved" trandisp=noop service="HTTPS" duration=241 sentbyte=132 rcvdbyte=92 sentpkt=3 rcvdpkt=2 appcat="unscanned"',
 	'<189>192.168.26.254 myApp time=16:31:28 devname=FG600B3909601440 devid=FG600B3909601440 logid=0000000013 type=traffic subtype=forward level=notice vd=VDOM-SNOC srcip=192.168.22.68 srcport=51448 srcintf="port3" dstip=216.58.210.174 dstport=443 dstintf="port7" sessionid=128625552 proto=6 action=close policyid=39 dstcountry="United States" srccountry="Reserved" trandisp=noop service="HTTPS" duration=241 sentbyte=132 rcvdbyte=92 sentpkt=3 rcvdpkt=2 appcat="unscanned"',
 	'<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][exampleSDID@32474 iut="4" eventSource="Application" eventID="1012"] BOMAn application event log entry',
-	'<30>May  8 00:01:01 logica5_engine6 systemd: Starting Session 63 of user root.'
+	'<30>May  8 00:01:01 logica5_engine6 systemd: Starting Session 63 of user root.',
+	'<13>May 9 11:41:08 192.168.110.11 MSWinEventLog 1 ||{54849625-5478-4994-A5BA-3E3B0328C30D}||Microsoft-Windows',
+	'Jun 15 17:13:50 192.168.17.72 MSWinEventLog 1 ||||MsiInstaller||11707||0||Información||Ninguna||||Clásico||2010/06/15 17:13:50||381||||||0||0||0||0|| ||Application||WIN-ZARKLN8SUVH||Administrador||Producto: Microsoft .NET Framework 3.5 -- La instalación se completó correctamente.;(NULL);(NULL);;||Producto: Microsoft .NET Framework 3.5 -- La instalación se completó correctamente.',
+	'<13>May  9 16:56:32 192.168.110.12 MSWinEventLog 1 ||{54849625-5478-4994-A5BA-3E3B0328C30D}||Microsoft-Windows-Security-Auditing||4634||0||Informaciï¿½n||||Informaciï¿½n||Auditorï¿½a correcta||2017-05-09 16:56:32||267119563||||||492||384||0||0|| ||Security||GICA-DC-02.grupoica.local||||S-1-5-21-1549636476-3519663633-904275800-7216;GVDI-SEV-010$;GRUPOICA;1C5B0D9Fh;3||Se cerrï¿½ sesiï¿½n en una cuenta.    Sujeto:  \tId. de seguridad:\t\tS-1-5-21-1549636476-3519663633-904275800-7216  \tNombre de cuenta:\t\tGVDI-SEV-010$  \tDominio de cuenta:\t\tGRUPOICA  \tId. de inicio de sesiï¿½n:\t\t0x1c5b0d9f    Tipo de inicio de sesiï¿½n:\t\t\t3    Este evento se genera cuando se destruye una sesiï¿½n de inicio. Puede estar correlacionado de manera positiva con un evento de inicio de sesiï¿½n mediante el valor Id. de inicio de sesiï¿½n. Los id. de inicio de sesiï¿½n sï¿½lo son ï¿½nicos entre reinicios en el mismo equipo.\n'
 ]
 
 MSGS.map(parser).forEach(e=>console.log(e));
+/*
 var s = Date.now();
 for(var i=0;i<COUNT;i++)
 	MSGS.forEach(parser);
@@ -21,3 +25,4 @@ var e = Date.now();
 var t =((e-s)/1000)/MSGS.length;
 var r = Math.floor(COUNT/t);
 console.log(r+" messages per second");
+*/
