@@ -18,12 +18,22 @@ const MSGS = [
 ]
 
 MSGS.map(parser).forEach(e=>console.log(e));
-/*
+
 var s = Date.now();
-for(var i=0;i<COUNT;i++)
-	MSGS.forEach(parser);
-var e = Date.now();
-var t =((e-s)/1000)/MSGS.length;
-var r = Math.floor(COUNT/t);
-console.log(r+" messages per second");
-*/
+var i=0,j=0;
+
+function next() {
+	parser(MSGS[(i++)%MSGS.length]);
+	j++;
+	setImmediate(next);
+}
+
+setTimeout(()=>{
+	var e = Date.now();
+	var t =((e-s)/1000);
+	var r = Math.floor(j/t);
+	console.log(r+" messages per second");
+	process.exit();
+},60000);
+
+next();
