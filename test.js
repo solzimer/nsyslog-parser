@@ -35,7 +35,7 @@ setTimeout(()=>{
 	var t =((e-s)/1000);
 	var r = Math.floor(j/t);
 	console.log(r+" messages per second");
-	process.exit();
+	//process.exit();
 },60000);
 
 next();

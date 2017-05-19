@@ -14,8 +14,5 @@
     "RFC 3164",
     "RFC 5424",
     "bsd"
-  ],
-  "dependencies": {
-    "moment": "^2.15.1"
-  }
+  ]
 }

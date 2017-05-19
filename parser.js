@@ -1,5 +1,4 @@
 const
-	moment = require("moment"),
 	Pri = require("./pri.js");
 
 const RXS = {
@@ -68,7 +67,7 @@ function parse(line) {
 			entry.type = "RFC5424";
 			item = items.peek()+" ";
 			if(item.match(RXS.ts)) {
-				entry.ts = moment(item.match(RXS.ts)[0].trim()).toDate();
+				entry.ts = new Date(Date.parse(item.match(RXS.ts)[0].trim()));
 			}
 		}
 		// BSD
@@ -77,7 +76,8 @@ function parse(line) {
 			var month = item.trim();
 			var day = items.peek();
 			var time = items.peek();
-			entry.ts = moment(month+" "+day+" "+time,"MMM DD HH:mm:ss").toDate();
+			var year = new Date().getYear() + 1900
+			entry.ts = new Date(Date.parse(year+" "+month+" "+day+" "+time));
 		}
 		else {
 			entry.type = "UNKNOWN";
