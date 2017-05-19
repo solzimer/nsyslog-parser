@@ -134,15 +134,33 @@ function parse(line) {
 		var sdata = entry.message.match(RXS.sdata) || [];
 		var idx=0;
 		entry.structuredData = sdata.map(item=>{
-			var map = {};
+			var map = {}, nokeys = [];
+			var lastKey = null;
 			idx = entry.message.indexOf(item)+item.length+1;
-			item.replace(/(^\[)|(\]$)/g,"").split(" ").map((t,i)=>{
-				if(i==0) return {key:"$id",val:t};
+			item.replace(/(^\[)|(\]$)/g,"").split(" ").forEach((t,i)=>{
+				// Extra space
+				if(!t.trim()) return;
+				// First element (ID of data)
+				if(i==0) {
+					map["$id"] = t;
+				}
+				// Key/Pair values
 				else {
 					var kv = t.split("=");
-					return {key:kv[0],val:(kv[1]||"").replace(/\"/g,"")};
+					// Correct key/value pair
+					if(kv[0] && kv[1] && kv[1]!='"') {
+						lastKey = kv.shift();
+						map[lastKey] = kv.join("=").replace(/\"/g,"");
+					}
+					// Last key had values separated by spaces
+					else if(kv[0] && kv[1]===undefined){
+						map[lastKey] += " "+(kv[0]||"").replace(/\"/g,"");
+					}
+					else if(kv[0] && (!kv[1].length || kv[1]=='"')){
+						map[lastKey] += " "+(kv[0]||"").replace(/\"/g,"")+"=";
+					}
 				}
-			}).forEach(kv=>map[kv.key]=kv.val);
+			});
 			return map;
 		});
 		entry.message = entry.message.substring(idx);
