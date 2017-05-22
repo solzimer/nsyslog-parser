@@ -31,68 +31,68 @@ console.log(parser(ietfLine);
 ## Results
 
 ```javascript
-	{
-		originalMessage: '<34>Oct 11 22:14:15 mymachine su: \'su root\' failed for lonvick on /dev/pts/8',
-		pri: '<34>',
-		prival: 34,
-		facilityval: 4,
-		levelval: 2,
-		facility: 'auth',
-		level: 'crit',
-		type: 'BSD',
-		ts: '2017-10-11T20:14:15.000Z',
-		host: 'mymachine',
-		appName: 'su',
-		message: '\'su root\' failed for lonvick on /dev/pts/8',
-		chain: [],
-		fields: [],
-		header: '<34>Oct 11 22:14:15 mymachine su: '
-	}
-	{
-		originalMessage: '<110>1 2009-05-03T14:00:39.529966+02:00 host.example.org/relay.example.org syslogd 2138 - [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][exampleSDID@32474 iut="4" eventSource="Application" eventID="1012"][ssign VER="0111" RSID="1" SG="0" SPRI="0" GBC="2" FMN="1" CNT="7" HB="K6wzcombEvKJ+UTMcn9bPryAeaU= zrkDcIeaDluypaPCY8WWzwHpPok= zgrWOdpx16ADc7UmckyIFY53icE= XfopJ+S8/hODapiBBCgVQaLqBKg= J67gKMFl/OauTC20ibbydwIlJC8= M5GziVgB6KPY3ERU1HXdSi2vtdw= Wxd/lU7uG/ipEYT9xeqnsfohyH0=" SIGN="AKBbX4J7Qkrwu wdbV7Taujk2lvOf8gCgC62We1QYfnrNHz7FzAvdySuMyfM="] BOMAn application event log entry',
-		pri: '<110>',
-		prival: 110,
-		facilityval: 13,
-		levelval: 6,
-		facility: 'security',
-		level: 'info',
-		version: 1,
-		type: 'RFC5424',
-		ts: '2009-05-03T12:00:39.529Z',
-		host: 'relay.example.org',
-		appName: 'syslogd',
-		pid: '2138',
-		messageid: '-',
-		message: 'BOMAn application event log entry',
-		chain: [ 'host.example.org' ],
-		structuredData:
-		[
-			{
-				'$id': 'exampleSDID@32473',
-				iut: '3',
-				eventSource: 'Application',
-				eventID: '1011'
-			},
-			{
-				'$id': 'exampleSDID@32474',
-				iut: '4',
-				eventSource: 'Application',
-				eventID: '1012'
-			},
-			{
-				'$id': 'ssign',
-				VER: '0111',
-				RSID: '1',
-				SG: '0',
-				SPRI: '0',
-				GBC: '2',
-				FMN: '1',
-				CNT: '7',
-				HB: 'K6wzcombEvKJ+UTMcn9bPryAeaU= zrkDcIeaDluypaPCY8WWzwHpPok= zgrWOdpx16ADc7UmckyIFY53icE= XfopJ+S8/hODapiBBCgVQaLqBKg= J67gKMFl/OauTC20ibbydwIlJC8= M5GziVgB6KPY3ERU1HXdSi2 vtdw= Wxd/lU7uG/ipEYT9xeqnsfohyH0=',
-				SIGN: 'AKBbX4J7QkrwuwdbV7Taujk2lvOf8gCgC62We1QYfnrNHz7FzAvdySuMyfM='
-			}
-		],
-	  fields: [],
-	  header: '<110>1 2009-05-03T14:00:39.529966+02:00 host.example.org/relay.example.org syslogd 2138 - [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][exampleSDID@32474 iut="4" eventSource="Application" eventID="1012"][ssign VER="0111" RSID="1" SG="0" SPRI="0" GBC="2" FMN="1" CNT="7" HB="K6wzcombEvKJ+UTMcn9bPryAeaU= zrkDcIeaDluypaPCY8WWzwHpPok= zgrWOdpx16ADc7UmckyIFY53icE= XfopJ+S8/hODapiBBCgVQaLqBKg= J67gKMFl/OauTC20ibbydwIlJC8= M5GziVgB6KPY3ERU1HXdSi2vtdw= Wxd/lU7uG/ipEYT9xeqnsfohyH0=" SIGN="AKBbX4J7QkrwuwdbV7Tauj k2lvOf8gCgC62We1QYfnrNHz7FzAvdySuMyfM="]'
-	}
+{
+	originalMessage: '<34>Oct 11 22:14:15 mymachine su: \'su root\' failed for lonvick on /dev/pts/8',
+	pri: '<34>',
+	prival: 34,
+	facilityval: 4,
+	levelval: 2,
+	facility: 'auth',
+	level: 'crit',
+	type: 'BSD',
+	ts: '2017-10-11T20:14:15.000Z',
+	host: 'mymachine',
+	appName: 'su',
+	message: '\'su root\' failed for lonvick on /dev/pts/8',
+	chain: [],
+	fields: [],
+	header: '<34>Oct 11 22:14:15 mymachine su: '
+}
+{
+	originalMessage: '<110>1 2009-05-03T14:00:39.529966+02:00 host.example.org/relay.example.org syslogd 2138 - [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][exampleSDID@32474 iut="4" eventSource="Application" eventID="1012"][ssign VER="0111" RSID="1" SG="0" SPRI="0" GBC="2" FMN="1" CNT="7" HB="K6wzcombEvKJ+UTMcn9bPryAeaU= zrkDcIeaDluypaPCY8WWzwHpPok= zgrWOdpx16ADc7UmckyIFY53icE= XfopJ+S8/hODapiBBCgVQaLqBKg= J67gKMFl/OauTC20ibbydwIlJC8= M5GziVgB6KPY3ERU1HXdSi2vtdw= Wxd/lU7uG/ipEYT9xeqnsfohyH0=" SIGN="AKBbX4J7Qkrwu wdbV7Taujk2lvOf8gCgC62We1QYfnrNHz7FzAvdySuMyfM="] BOMAn application event log entry',
+	pri: '<110>',
+	prival: 110,
+	facilityval: 13,
+	levelval: 6,
+	facility: 'security',
+	level: 'info',
+	version: 1,
+	type: 'RFC5424',
+	ts: '2009-05-03T12:00:39.529Z',
+	host: 'relay.example.org',
+	appName: 'syslogd',
+	pid: '2138',
+	messageid: '-',
+	message: 'BOMAn application event log entry',
+	chain: [ 'host.example.org' ],
+	structuredData:
+	[
+		{
+			'$id': 'exampleSDID@32473',
+			iut: '3',
+			eventSource: 'Application',
+			eventID: '1011'
+		},
+		{
+			'$id': 'exampleSDID@32474',
+			iut: '4',
+			eventSource: 'Application',
+			eventID: '1012'
+		},
+		{
+			'$id': 'ssign',
+			VER: '0111',
+			RSID: '1',
+			SG: '0',
+			SPRI: '0',
+			GBC: '2',
+			FMN: '1',
+			CNT: '7',
+			HB: 'K6wzcombEvKJ+UTMcn9bPryAeaU= zrkDcIeaDluypaPCY8WWzwHpPok= zgrWOdpx16ADc7UmckyIFY53icE= XfopJ+S8/hODapiBBCgVQaLqBKg= J67gKMFl/OauTC20ibbydwIlJC8= M5GziVgB6KPY3ERU1HXdSi2 vtdw= Wxd/lU7uG/ipEYT9xeqnsfohyH0=',
+			SIGN: 'AKBbX4J7QkrwuwdbV7Taujk2lvOf8gCgC62We1QYfnrNHz7FzAvdySuMyfM='
+		}
+	],
+  fields: [],
+  header: '<110>1 2009-05-03T14:00:39.529966+02:00 host.example.org/relay.example.org syslogd 2138 - [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][exampleSDID@32474 iut="4" eventSource="Application" eventID="1012"][ssign VER="0111" RSID="1" SG="0" SPRI="0" GBC="2" FMN="1" CNT="7" HB="K6wzcombEvKJ+UTMcn9bPryAeaU= zrkDcIeaDluypaPCY8WWzwHpPok= zgrWOdpx16ADc7UmckyIFY53icE= XfopJ+S8/hODapiBBCgVQaLqBKg= J67gKMFl/OauTC20ibbydwIlJC8= M5GziVgB6KPY3ERU1HXdSi2vtdw= Wxd/lU7uG/ipEYT9xeqnsfohyH0=" SIGN="AKBbX4J7QkrwuwdbV7Tauj k2lvOf8gCgC62We1QYfnrNHz7FzAvdySuMyfM="]'
+}
 ```
