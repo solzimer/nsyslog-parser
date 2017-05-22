@@ -1,67 +1,98 @@
 # nsyslog-parser
-Syslog Parser. Accepts [RFC 3164 (BSD)](https://tools.ietf.org/search/rfc3164) and [RFC 5424](https://tools.ietf.org/html/rfc5424) formats
+Syslog Parser. Accepts [RFC 3164 (BSD)](https://tools.ietf.org/search/rfc3164) and [RFC 5424](https://tools.ietf.org/html/rfc5424) formats.
+Although thought as a parser for stantard syslog messages, there are too many systems/devices out there that sends erroneous, propietary or simply malformed messages. **nsyslog-parser** is flexible enough to try and parse every single message to extract as many information as possible, without throwing any errors.
 
-**Installation**
+## Features
+
+* [RFC 3164 (BSD)](https://tools.ietf.org/search/rfc3164) and [RFC 5424](https://tools.ietf.org/html/rfc5424) formats
+* Extracts information of non standard, erroneus or malformed messages
+* Parses [IETF Structured data](https://tools.ietf.org/html/rfc5424#section-6.3)
+* Recognizes non-standard host-chain header
+
+## Installation
 
     npm install nsyslog-parser
 
-**Usage**
+## Usage
+
 ```javascript
 const parser = require("nsyslog-parser");
 
+// Standard BSD message
 var bsdLine = "<34>Oct 11 22:14:15 mymachine su: 'su root' failed for lonvick on /dev/pts/8";
-var ietfLine = "<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][exampleSDID@32474 iut="4" eventSource="Application" eventID="1012"] BOMAn application event log entry";
+
+// IETF (RFC 5424) message, with structured data and chained hostnames
+var ietfLine = "<110>1 2009-05-03T14:00:39.529966+02:00 host.example.org/relay.example.org syslogd 2138 - [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][exampleSDID@32474 iut="4" eventSource="Application" eventID="1012"][ssign VER="0111" RSID="1" SG="0" SPRI="0" GBC="2" FMN="1" CNT="7" HB="K6wzcombEvKJ+UTMcn9bPryAeaU= zrkDcIeaDluypaPCY8WWzwHpPok= zgrWOdpx16ADc7UmckyIFY53icE= XfopJ+S8/hODapiBBCgVQaLqBKg= J67gKMFl/OauTC20ibbydwIlJC8= M5GziVgB6KPY3ERU1HXdSi2vtdw= Wxd/lU7uG/ipEYT9xeqnsfohyH0=" SIGN="AKBbX4J7QkrwuwdbV7Taujk2lvOf8gCgC62We1QYfnrNHz7FzAvdySuMyfM="] BOMAn application event log entry";
 
 console.log(parser(bsdLine);
 console.log(parser(ietfLine);
 ```
 
-**Results**
+## Results
+
 ```javascript
-  {
-  originalMessage: '<34>Oct 11 22:14:15 mymachine su: \'su root\' failed for lonvick on /dev/pts/8',
-	pri: '<34>',
-	prival: 34,
-	facilityval: 4,
-	levelval: 2,
-	facility: 'auth',
-	level: 'crit',
-	type: 'BSD',
-	ts: '2017-10-11T20:14:15.000Z',
-	host: 'mymachine',
-	appName: 'su',
-	message: '\'su root\' failed for lonvick on /dev/pts/8',
-	fields: [],
-	header: '<34>Oct 11 22:14:15 mymachine su: '
-}
-{
-	originalMessage: '<34>1 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - BOM\'su root\' failed for lonvick on /dev/pts/8',
-	pri: '<34>',
-	prival: 34,
-	facilityval: 4,
-	levelval: 2,
-	facility: 'auth',
-	level: 'crit',
-	version: 1,
-	type: 'RFC5424',
-	ts: '2003-10-11T22:14:15.003Z',
-	host: 'mymachine.example.com',
-	appName: 'su',
-	pid: '-',
-	messageid: 'ID47',
-	structuredData: '-',
-	message: 'BOM\'su root\' failed for lonvick on /dev/pts/8',
-	structuredData:
-	[
-		{'$id': 'exampleSDID@32473',
-		iut: '3',
-		eventSource: 'Application',
-		eventID: '1011' },
-		{'$id': 'exampleSDID@32474',
-		iut: '4',
-		eventSource: 'Application',
-		eventID: '1012' } ]
-	fields: [],
-	header: '<34>1 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - '
-}
+	{
+		originalMessage: '<34>Oct 11 22:14:15 mymachine su: \'su root\' failed for lonvick on /dev/pts/8',
+		pri: '<34>',
+		prival: 34,
+		facilityval: 4,
+		levelval: 2,
+		facility: 'auth',
+		level: 'crit',
+		type: 'BSD',
+		ts: '2017-10-11T20:14:15.000Z',
+		host: 'mymachine',
+		appName: 'su',
+		message: '\'su root\' failed for lonvick on /dev/pts/8',
+		chain: [],
+		fields: [],
+		header: '<34>Oct 11 22:14:15 mymachine su: '
+	}
+	{
+		originalMessage: '<110>1 2009-05-03T14:00:39.529966+02:00 host.example.org/relay.example.org syslogd 2138 - [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][exampleSDID@32474 iut="4" eventSource="Application" eventID="1012"][ssign VER="0111" RSID="1" SG="0" SPRI="0" GBC="2" FMN="1" CNT="7" HB="K6wzcombEvKJ+UTMcn9bPryAeaU= zrkDcIeaDluypaPCY8WWzwHpPok= zgrWOdpx16ADc7UmckyIFY53icE= XfopJ+S8/hODapiBBCgVQaLqBKg= J67gKMFl/OauTC20ibbydwIlJC8= M5GziVgB6KPY3ERU1HXdSi2vtdw= Wxd/lU7uG/ipEYT9xeqnsfohyH0=" SIGN="AKBbX4J7Qkrwu wdbV7Taujk2lvOf8gCgC62We1QYfnrNHz7FzAvdySuMyfM="] BOMAn application event log entry',
+		pri: '<110>',
+		prival: 110,
+		facilityval: 13,
+		levelval: 6,
+		facility: 'security',
+		level: 'info',
+		version: 1,
+		type: 'RFC5424',
+		ts: '2009-05-03T12:00:39.529Z',
+		host: 'relay.example.org',
+		appName: 'syslogd',
+		pid: '2138',
+		messageid: '-',
+		message: 'BOMAn application event log entry',
+		chain: [ 'host.example.org' ],
+		structuredData:
+		[
+			{
+				'$id': 'exampleSDID@32473',
+				iut: '3',
+				eventSource: 'Application',
+				eventID: '1011'
+			},
+			{
+				'$id': 'exampleSDID@32474',
+				iut: '4',
+				eventSource: 'Application',
+				eventID: '1012'
+			},
+			{
+				'$id': 'ssign',
+				VER: '0111',
+				RSID: '1',
+				SG: '0',
+				SPRI: '0',
+				GBC: '2',
+				FMN: '1',
+				CNT: '7',
+				HB: 'K6wzcombEvKJ+UTMcn9bPryAeaU= zrkDcIeaDluypaPCY8WWzwHpPok= zgrWOdpx16ADc7UmckyIFY53icE= XfopJ+S8/hODapiBBCgVQaLqBKg= J67gKMFl/OauTC20ibbydwIlJC8= M5GziVgB6KPY3ERU1HXdSi2 vtdw= Wxd/lU7uG/ipEYT9xeqnsfohyH0=',
+				SIGN: 'AKBbX4J7QkrwuwdbV7Taujk2lvOf8gCgC62We1QYfnrNHz7FzAvdySuMyfM='
+			}
+		],
+	  fields: [],
+	  header: '<110>1 2009-05-03T14:00:39.529966+02:00 host.example.org/relay.example.org syslogd 2138 - [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][exampleSDID@32474 iut="4" eventSource="Application" eventID="1012"][ssign VER="0111" RSID="1" SG="0" SPRI="0" GBC="2" FMN="1" CNT="7" HB="K6wzcombEvKJ+UTMcn9bPryAeaU= zrkDcIeaDluypaPCY8WWzwHpPok= zgrWOdpx16ADc7UmckyIFY53icE= XfopJ+S8/hODapiBBCgVQaLqBKg= J67gKMFl/OauTC20ibbydwIlJC8= M5GziVgB6KPY3ERU1HXdSi2vtdw= Wxd/lU7uG/ipEYT9xeqnsfohyH0=" SIGN="AKBbX4J7QkrwuwdbV7Tauj k2lvOf8gCgC62We1QYfnrNHz7FzAvdySuMyfM="]'
+	}
 ```
