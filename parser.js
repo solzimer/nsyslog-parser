@@ -129,6 +129,10 @@ function parse(line) {
 		entry.message = items.join(" ");
 	}
 
+	// Chained hostnames
+	entry.chain = (entry.host||"").split("/");
+	entry.host = entry.chain.pop();
+
 	// Structured data
 	if(entry.type=="RFC5424") {
 		var sdata = entry.message.match(RXS.sdata) || [];
