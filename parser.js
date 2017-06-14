@@ -92,27 +92,35 @@ function parse(line) {
 	// Is a standard syslog message
 	if(entry.type) {
 		endparse = false;
+
+		function invalidate(item) {
+			items.unshift(item);
+			entry.message = items.join(" ");
+			endparse = true;
+		}
+
 		while(line.length && !endparse) {
 			var item = items.peek();
 			if(!item) {
 				endparse = true;
 			}
 			else if(item.endsWith(":")){
-				assign(entry,item.replace(/:$/,"").trim())
-				entry.message = items.join(" ");
-				endparse = true;
+				if(item.match(RXS.invalid)) {
+					invalidate(item);
+				}
+				else {
+					assign(entry,item.replace(/:$/,"").trim())
+					entry.message = items.join(" ");
+					endparse = true;
+				}
 			}
 			else if(!items.length) {
-				items.unshift(item);
-				entry.message = items.join(" ");
-				endparse = true;
+				invalidate(item);
 			}
 			else {
 				// Invalid item (malformed message)
 				if(item.match(RXS.invalid)) {
-					items.unshift(item);
-					entry.message = items.join(" ");
-					endparse = true;
+					invalidate(item);
 				}
 				else {
 					var r = assign(entry,item.replace(/: $/,"").trim())
