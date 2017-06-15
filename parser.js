@@ -105,11 +105,12 @@ function parse(line) {
 				endparse = true;
 			}
 			else if(item.endsWith(":")){
-				if(item.match(RXS.invalid)) {
+				let eitem = item.replace(/:$/,"").trim();
+				if(eitem.match(RXS.invalid)) {
 					invalidate(item);
 				}
 				else {
-					assign(entry,item.replace(/:$/,"").trim())
+					assign(entry,eitem)
 					entry.message = items.join(" ");
 					endparse = true;
 				}

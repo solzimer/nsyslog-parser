@@ -17,7 +17,8 @@ const MSGS = [
 	'<7>1 2017-05-11T14:45:31.995+02:00 logica5p storm1 - - - 192.168.120.172 - - [04/Nov/2015:15:11:33 +0100] "GET /localclassifieds//classifieds/Site_Admin/admin.php  HTTP/1.1" 404 1137 "-" "Mozilla/5.0 [en] (X11, U; OpenVAS 7.0.2)"',
 	'May 06 10:05:03 CCLogTap::profileRemoved, Owner: com.apple.iokit.IO80211Family, Name: IO80211AWDLPeerManager',
 	'<110>1 2009-05-03T14:00:39.529966+02:00 host.example.org/relay.example.org syslogd 2138 - [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][exampleSDID@32474 iut="4" eventSource="Application" eventID="1012"][ssign VER="0111" RSID="1" SG="0" SPRI="0" GBC="2" FMN="1" CNT="7" HB="K6wzcombEvKJ+UTMcn9bPryAeaU= zrkDcIeaDluypaPCY8WWzwHpPok= zgrWOdpx16ADc7UmckyIFY53icE= XfopJ+S8/hODapiBBCgVQaLqBKg= J67gKMFl/OauTC20ibbydwIlJC8= M5GziVgB6KPY3ERU1HXdSi2vtdw= Wxd/lU7uG/ipEYT9xeqnsfohyH0=" SIGN="AKBbX4J7QkrwuwdbV7Taujk2lvOf8gCgC62We1QYfnrNHz7FzAvdySuMyfM="] BOMAn application event log entry',
-	'<163>8,3,00000002-0002-0002-0002-000000028629,00000001-0001-0001-0001-000000028629,"28629: SMB: Microsoft Windows Search Service Memory Corruption Vulnerability",28629,"tcp",172.19.215.118,65409,172.22.215.36,445,1,11A,11B,25,0,"madips5k01",33497931,1497449283018, ,5757687'
+	'<163>8,3,00000002-0002-0002-0002-000000028629,00000001-0001-0001-0001-000000028629,"28629: SMB: Microsoft Windows Search Service Memory Corruption Vulnerability",28629,"tcp",172.19.215.118,65409,172.22.215.36,445,1,11A,11B,25,0,"madips5k01",33497931,1497449283018, ,5757687',
+	"<20>Jun 15 12:33:52 Syslog_LogICAV: Warning: Received an invalid DNS Response: rcode=ServFail data=\"'F\\\\x15\\\\x81\\\\x82\\\\x00\\\\x01\\\\x00\\\\x00\\\\x00\\\\x00\\\\x00\\\\x00\\\\x06health\\\\x03gov\\\\x02bh\\\\x00\\\\x00\\\\x0f\\\\x00\\\\x01'\" to IP 172.22.204.220 looking up health.gov.bh"
 ]
 
 MSGS.map(parser).forEach(e=>console.log(e));
