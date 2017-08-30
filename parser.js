@@ -1,5 +1,6 @@
 const
-	Pri = require("./pri.js");
+	Pri = require("./pri.js"),
+	CEF = require("./cef.js");
 
 const RXS = {
 	"pri" : /^<\d+>/,
@@ -11,6 +12,7 @@ const RXS = {
 	"ts" : /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\S+ /,
 	"invalid" : /[^a-zA-Z0-9\.\$\-_#%\/]/,
 	"sdata" : /\[(\S+)( [^\=]+\=\"[^\"]+\")+\]/g,
+	"cef" : /^CEF:\d+/
 }
 
 Array.prototype.peek = function() {
@@ -179,14 +181,22 @@ function parse(line) {
 		entry.message = entry.message.substring(idx);
 	}
 
-	// Message with fields
-	var fields = [];
-	entry.message.split(",").forEach(kv=>{
-		var prop = kv.split("=");
-		if(prop.length==2)
-			fields[prop[0]] = prop[1];
-	});
-	entry.fields = fields;
+	// CEF Event message
+	if(RXS.cef.test(entry.message)) {
+		entry.type = "CEF";
+		entry.fields = CEF.parse(entry.message);
+	}
+	// Default syslog message
+	else {
+		// Message with fields
+		var fields = [];
+		entry.message.split(",").forEach(kv=>{
+			var prop = kv.split("=");
+			if(prop.length==2)
+				fields[prop[0]] = prop[1];
+		});
+		entry.fields = fields;
+	}
 
 	// header
 	entry.header = line.substring(0,line.length-entry.message.length);
