@@ -20,8 +20,94 @@
 			$.NSyslog = $.NSyslog || {};
 			$.NSyslog.parse = parser;
 		})(window);
-	}, { "./parser.js": 2 }], 2: [function (require, module, exports) {
-		var Pri = require("./pri.js");
+	}, { "./parser.js": 3 }], 2: [function (require, module, exports) {
+		var FRX = /[a-zA-Z][a-zA-Z0-9]+=/;
+		var CEP_FIELDS = ["version", "deviceVendor", "deviceProduct", "deviceVersion", "deviceEventClassID", "name", "severity", "extension"];
+
+		function splitHeaders(text) {
+			var arr = [],
+			    map = {};
+			var scape = false;
+			var fields = 7;
+			var curr = "";
+
+			text.split("").forEach(function (ch) {
+				if (!fields) {
+					curr += ch;
+				} else {
+					if (ch == "|") {
+						if (scape) {
+							scape = false;
+							curr += ch;
+						} else {
+							arr.push(curr);
+							curr = "";
+							fields--;
+						}
+					} else if (ch == "\\") {
+						curr += ch;
+						scape = !scape;
+					} else {
+						scape = false;
+						curr += ch;
+					}
+				}
+			});
+
+			if (curr.length) arr.push(curr);
+
+			CEP_FIELDS.forEach(function (f, i) {
+				return map[f] = arr[i];
+			});
+			return map;
+		}
+
+		function splitFields(txt) {
+			var tokens = [],
+			    map = {};
+			var res = null;
+
+			do {
+				res = FRX.exec(txt);
+				if (res) {
+					var tok = res[0];
+					var idx = res.index;
+					if (tokens.length) {
+						tokens[tokens.length - 1] += txt.substring(0, idx);
+					}
+					tokens.push(tok);
+					txt = txt.substring(idx + tok.length);
+				} else if (txt.length && tokens.length) {
+					tokens[tokens.length - 1] += txt;
+					txt = "";
+				}
+			} while (res && txt.length);
+
+			tokens.map(function (t) {
+				return t.trim();
+			}).map(function (t) {
+				t = t.split("=");
+				return { k: t.shift(), v: t.join("=") };
+			}).forEach(function (t) {
+				map[t.k] = t.v;
+			});
+
+			return map;
+		}
+
+		module.exports = {
+			parse: function parse(text) {
+				var headers = splitHeaders(text);
+				var fields = splitFields(headers.extension || "");
+				return {
+					headers: headers,
+					fields: fields
+				};
+			}
+		};
+	}, {}], 3: [function (require, module, exports) {
+		var Pri = require("./pri.js"),
+		    CEF = require("./cef.js");
 
 		var RXS = {
 			"pri": /^<\d+>/,
@@ -32,7 +118,8 @@
 			"time": /^\d+:\d+:\d+ /,
 			"ts": /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\S+ /,
 			"invalid": /[^a-zA-Z0-9\.\$\-_#%\/]/,
-			"sdata": /\[(\S+)( [^\=]+\=\"[^\"]+\")+\]/g
+			"sdata": /\[(\S+)( [^\=]+\=\"[^\"]+\")+\]/g,
+			"cef": /^CEF:\d+/
 		};
 
 		Array.prototype.peek = function () {
@@ -187,13 +274,23 @@
 				entry.message = entry.message.substring(idx);
 			}
 
-			// Message with fields
-			var fields = [];
-			entry.message.split(",").forEach(function (kv) {
-				var prop = kv.split("=");
-				if (prop.length == 2) fields[prop[0]] = prop[1];
-			});
-			entry.fields = fields;
+			// CEF Event message
+			if (RXS.cef.test(entry.message)) {
+				entry.type = "CEF";
+				var cef = CEF.parse(entry.message);
+				entry.cef = cef.headers;
+				entry.fields = cef.fields;
+			}
+			// Default syslog message
+			else {
+					// Message with fields
+					var fields = [];
+					entry.message.split(",").forEach(function (kv) {
+						var prop = kv.split("=");
+						if (prop.length == 2) fields[prop[0]] = prop[1];
+					});
+					entry.fields = fields;
+				}
 
 			// header
 			entry.header = line.substring(0, line.length - entry.message.length);
@@ -208,7 +305,7 @@
 				return { err: err };
 			}
 		};
-	}, { "./pri.js": 3 }], 3: [function (require, module, exports) {
+	}, { "./cef.js": 2, "./pri.js": 4 }], 4: [function (require, module, exports) {
 		var FACILITY = [{ id: "kern", label: "kernel messages" }, { id: "user", label: "user-level messages" }, { id: "mail", label: "mail system" }, { id: "daemon", label: "system daemons" }, { id: "auth", label: "security/authorization messages" }, { id: "syslog", label: "messages generated internally by syslogd" }, { id: "lpr", label: "line printer subsystem" }, { id: "news", label: "network news subsystem" }, { id: "uucp", label: "UUCP subsystem" }, { id: "cron", label: "clock daemon" }, { id: "authpriv", label: "security/authorization messages" }, { id: "ftp", label: "FTP daemon" }, { id: "ntp", label: "NTP subsystem" }, { id: "security", label: "log audit" }, { id: "console", label: "log alert" }, { id: "solaris-cron", label: "clock daemon" }, { id: "local0", label: "locally used facility 0" }, { id: "local1", label: "locally used facility 0" }, { id: "local2", label: "locally used facility 0" }, { id: "local3", label: "locally used facility 0" }, { id: "local4", label: "locally used facility 0" }, { id: "local5", label: "locally used facility 0" }, { id: "local6", label: "locally used facility 0" }, { id: "local7", label: "locally used facility 0" }];
 
 		var LEVEL = [{ id: "emerg", label: "system is unusable" }, { id: "alert", label: "action must be taken immediately" }, { id: "crit", label: "critical conditions" }, { id: "error", label: "error conditions" }, { id: "warn", label: "warning conditions" }, { id: "notice", label: "normal but significant condition" }, { id: "info", label: "informational messages" }, { id: "debug", label: "debug-level messages" }];

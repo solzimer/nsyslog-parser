@@ -184,7 +184,9 @@ function parse(line) {
 	// CEF Event message
 	if(RXS.cef.test(entry.message)) {
 		entry.type = "CEF";
-		entry.fields = CEF.parse(entry.message);
+		let cef = CEF.parse(entry.message);
+		entry.cef = cef.headers;
+		entry.fields = cef.fields;
 	}
 	// Default syslog message
 	else {
