@@ -1,5 +1,5 @@
 # nsyslog-parser
-Syslog Parser. Accepts [RFC 3164 (BSD)](https://tools.ietf.org/search/rfc3164) and [RFC 5424](https://tools.ietf.org/html/rfc5424) formats.
+Syslog Parser. Accepts [RFC 3164 (BSD)](https://tools.ietf.org/search/rfc3164), [RFC 5424](https://tools.ietf.org/html/rfc5424) and [CEF Common Event Format](https://community.saas.hpe.com/t5/ArcSight-Connectors/ArcSight-Common-Event-Format-CEF-Guide/ta-p/1589306) formats.
 Although thought as a parser for stantard syslog messages, there are too many systems/devices out there that sends erroneous, propietary or simply malformed messages. **nsyslog-parser** is flexible enough to try and parse every single message to extract as many information as possible, without throwing any errors.
 
 ## Features
@@ -7,6 +7,7 @@ Although thought as a parser for stantard syslog messages, there are too many sy
 * [RFC 3164 (BSD)](https://tools.ietf.org/search/rfc3164) and [RFC 5424](https://tools.ietf.org/html/rfc5424) formats
 * Extracts information of non standard, erroneus or malformed messages
 * Parses [IETF Structured data](https://tools.ietf.org/html/rfc5424#section-6.3)
+* Parses [CEF Common Event Format](https://community.saas.hpe.com/t5/ArcSight-Connectors/ArcSight-Common-Event-Format-CEF-Guide/ta-p/1589306)
 * Recognizes non-standard host-chain header
 
 ## Installation
@@ -24,8 +25,11 @@ var bsdLine = "<34>Oct 11 22:14:15 mymachine su: 'su root' failed for lonvick on
 // IETF (RFC 5424) message, with structured data and chained hostnames
 var ietfLine = "<110>1 2009-05-03T14:00:39.529966+02:00 host.example.org/relay.example.org syslogd 2138 - [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][exampleSDID@32474 iut="4" eventSource="Application" eventID="1012"][ssign VER="0111" RSID="1" SG="0" SPRI="0" GBC="2" FMN="1" CNT="7" HB="K6wzcombEvKJ+UTMcn9bPryAeaU= zrkDcIeaDluypaPCY8WWzwHpPok= zgrWOdpx16ADc7UmckyIFY53icE= XfopJ+S8/hODapiBBCgVQaLqBKg= J67gKMFl/OauTC20ibbydwIlJC8= M5GziVgB6KPY3ERU1HXdSi2vtdw= Wxd/lU7uG/ipEYT9xeqnsfohyH0=" SIGN="AKBbX4J7QkrwuwdbV7Taujk2lvOf8gCgC62We1QYfnrNHz7FzAvdySuMyfM="] BOMAn application event log entry";
 
+// Syslog CEF (Common Event Format)
+var cefLine = "Jan 18 11:07:53 dsmhost CEF:0|Trend Micro|Deep Security Manager|<DSM version>|600|User Signed In|3|src=10.52.116.160 suser=admin target=admin msg=User signed in from 2001:db8::5";
 console.log(parser(bsdLine);
 console.log(parser(ietfLine);
+console.log(parser(cefLine);
 ```
 
 ## Results
@@ -94,5 +98,33 @@ console.log(parser(ietfLine);
 	],
   fields: [],
   header: '<110>1 2009-05-03T14:00:39.529966+02:00 host.example.org/relay.example.org syslogd 2138 - [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][exampleSDID@32474 iut="4" eventSource="Application" eventID="1012"][ssign VER="0111" RSID="1" SG="0" SPRI="0" GBC="2" FMN="1" CNT="7" HB="K6wzcombEvKJ+UTMcn9bPryAeaU= zrkDcIeaDluypaPCY8WWzwHpPok= zgrWOdpx16ADc7UmckyIFY53icE= XfopJ+S8/hODapiBBCgVQaLqBKg= J67gKMFl/OauTC20ibbydwIlJC8= M5GziVgB6KPY3ERU1HXdSi2vtdw= Wxd/lU7uG/ipEYT9xeqnsfohyH0=" SIGN="AKBbX4J7QkrwuwdbV7Tauj k2lvOf8gCgC62We1QYfnrNHz7FzAvdySuMyfM="]'
+}
+
+{
+	originalMessage: 'Jan 18 11:07:53 dsmhost CEF:0|Trend Micro|Deep Security Manager|<DSM version>|600|User Signed In|3|src=10.52.116.160 suser=admin target=admin msg=User signed in from 2001:db8::5',
+	pri: '',
+	prival: NaN,
+	type: 'CEF',
+	ts: '2017-01-18T10:07:53.000Z',
+	host: 'dsmhost',
+	message: 'CEF:0|Trend Micro|Deep Security Manager|<DSM version>|600|User Signed In|3|src=10.52.116.160 suser=admin target=admin msg=User signed in from 2001:db8::5',
+	chain: [],
+	cef: {
+		version: 'CEF:0',
+		deviceVendor: 'Trend Micro',
+		deviceProduct: 'Deep Security Manager',
+		deviceVersion: '<DSM version>',
+		deviceEventClassID: '600',
+		name: 'User Signed In',
+		severity: '3',
+		extension: 'src=10.52.116.160 suser=admin target=admin msg=User signed in from 2001:db8::5'
+	},
+  fields: {
+		src: '10.52.116.160',
+		suser: 'admin',
+		target: 'admin',
+		msg: 'User signed in from 2001:db8::5'
+	},
+	header: 'Jan 18 11:07:53 dsmhost '
 }
 ```
