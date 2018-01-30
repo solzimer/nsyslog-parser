@@ -15,9 +15,9 @@ const RXS = {
 	"cef" : /^CEF:\d+/
 }
 
-Array.prototype.peek = function() {
+function peek(arr) {
 	do {
-		var item = this.shift();
+		var item = arr.shift();
 		if(item===undefined) return item;
 		else item = item.trim();
 	}while(!item);
@@ -61,13 +61,13 @@ function parse(line) {
 	// Date search
 	var endparse = false;
 	while(line.length && !endparse) {
-		var item = items.peek()+" ";
+		var item = peek(items)+" ";
 
 		// RFC RFC5424
 		if(item.match(RXS.prinmr)) {
 			entry.version = parseInt(item);
 			entry.type = "RFC5424";
-			item = items.peek()+" ";
+			item = peek(items)+" ";
 			if(item.match(RXS.ts)) {
 				entry.ts = new Date(Date.parse(item.match(RXS.ts)[0].trim()));
 			}
@@ -76,8 +76,8 @@ function parse(line) {
 		else if(item.match(RXS.month)) {
 			entry.type = "BSD";
 			var month = item.trim();
-			var day = items.peek();
-			var time = items.peek();
+			var day = peek(items);
+			var time = peek(items);
 			var year = new Date().getYear() + 1900
 			entry.ts = new Date(Date.parse(year+" "+month+" "+day+" "+time));
 		}
@@ -102,7 +102,7 @@ function parse(line) {
 		}
 
 		while(line.length && !endparse) {
-			var item = items.peek();
+			var item = peek(items);
 			if(!item) {
 				endparse = true;
 			}
