@@ -30,7 +30,10 @@ function assign(entry,item) {
 	else if(!entry.appName) entry.appName = item.trim();
 	else if(!entry.pid) entry.pid = item.trim();
 	else if(!entry.messageid) entry.messageid = item.trim();
-	else if(!entry.structuredData) entry.structuredData = item.trim();
+	else if(!entry.structuredData) {
+		entry.structuredData = item.trim();
+		return false;
+	}
 	else return true;
 }
 
@@ -127,8 +130,12 @@ function parse(line) {
 				}
 				else {
 					var r = assign(entry,item.replace(/: $/,"").trim())
-					if(r) {
+					if(r===true) {
 						items.unshift(item);
+						entry.message = items.join(" ");
+						endparse = true;
+					}
+					else if(r===false) {
 						entry.message = items.join(" ");
 						endparse = true;
 					}
