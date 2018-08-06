@@ -117,7 +117,7 @@
 			"day": /^\d{1,2} /,
 			"time": /^\d+:\d+:\d+ /,
 			"ts": /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\S+ /,
-			"invalid": /[^a-zA-Z0-9\.\$\-_#%\/]/,
+			"invalid": /[^a-zA-Z0-9\.\$\-_#%\/\[\]]/,
 			"sdata": /\[(\S+)( [^\=]+\=\"[^\"]+\")+\]/g,
 			"cef": /^CEF:\d+/
 		};
@@ -132,7 +132,10 @@
 		}
 
 		function assign(entry, item) {
-			if (!entry.host) entry.host = item.trim();else if (!entry.appName) entry.appName = item.trim();else if (!entry.pid) entry.pid = item.trim();else if (!entry.messageid) entry.messageid = item.trim();else if (!entry.structuredData) entry.structuredData = item.trim();else return true;
+			if (!entry.host) entry.host = item.trim();else if (!entry.appName) entry.appName = item.trim();else if (!entry.pid) entry.pid = item.trim();else if (!entry.messageid) entry.messageid = item.trim();else if (!entry.structuredData) {
+				entry.structuredData = item.trim();
+				return false;
+			} else return true;
 		}
 
 		function parse(line) {
@@ -221,8 +224,11 @@
 							invalidate(item);
 						} else {
 							var r = assign(entry, item.replace(/: $/, "").trim());
-							if (r) {
+							if (r === true) {
 								items.unshift(item);
+								entry.message = items.join(" ");
+								endparse = true;
+							} else if (r === false) {
 								entry.message = items.join(" ");
 								endparse = true;
 							}
