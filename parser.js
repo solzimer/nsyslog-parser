@@ -6,7 +6,7 @@ const RXS = {
 	"pri" : /^<\d+>/,
 	"prinmr" : /^\d+ /,
 	"prival" : /<(\d+)>/,
-	"month" : /^[A-Z][a-z]{2} /,
+	"month" : /^[A-Za-z][a-z]{2} /,
 	"day" : /^\d{1,2} /,
 	"time" : /^\d+:\d+:\d+ /,
 	"ts" : /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\S+ /,
