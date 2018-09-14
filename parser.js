@@ -15,6 +15,11 @@ const RXS = {
 	"cef" : /^CEF:\d+/
 }
 
+const DOPS = {
+	cef : true,
+	fields : true
+}
+
 function peek(arr) {
 	do {
 		var item = arr.shift();
@@ -37,7 +42,9 @@ function assign(entry,item) {
 	else return true;
 }
 
-function parse(line) {
+function parse(line,opts) {
+	opts = opts || DOPS;
+
 	var pri = line.match(RXS.pri);
 	var entry = {
 		originalMessage : line
@@ -189,14 +196,14 @@ function parse(line) {
 	}
 
 	// CEF Event message
-	if(RXS.cef.test(entry.message)) {
+	if(opts.cef!==false && RXS.cef.test(entry.message)) {
 		entry.type = "CEF";
 		let cef = CEF.parse(entry.message);
 		entry.cef = cef.headers;
 		entry.fields = cef.fields;
 	}
 	// Default syslog message
-	else {
+	else if(opts.fields!==false && entry.type!="UNKNOWN"){
 		// Message with fields
 		var fields = [];
 		entry.message.split(",").forEach(kv=>{
@@ -213,4 +220,4 @@ function parse(line) {
 	return entry;
 }
 
-module.exports = function(line) {try {return parse(line)}catch(err){return {err:err}}};
+module.exports = function(line,opts) {try {return parse(line,opts)}catch(err){return {err:err}}};

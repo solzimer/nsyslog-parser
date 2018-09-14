@@ -7,9 +7,10 @@ MSGS.map(parser).forEach(e=>console.log(e));
 
 var s = Date.now();
 var i=0,j=0;
+var opts = {cef:false,fields:false};
 
 function next() {
-	parser(MSGS[(i++)%MSGS.length]);
+	parser(MSGS[(i++)%MSGS.length],opts);
 	j++;
 	setImmediate(next);
 }

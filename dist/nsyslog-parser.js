@@ -115,13 +115,18 @@
 			"pri": /^<\d+>/,
 			"prinmr": /^\d+ /,
 			"prival": /<(\d+)>/,
-			"month": /^[A-Z][a-z]{2} /,
+			"month": /^[A-Za-z][a-z]{2} /,
 			"day": /^\d{1,2} /,
 			"time": /^\d+:\d+:\d+ /,
 			"ts": /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\S+ /,
 			"invalid": /[^a-zA-Z0-9\.\$\-_#%\/\[\]\(\)]/,
 			"sdata": /\[(\S+)( [^\=]+\=\"[^\"]+\")+\]/g,
 			"cef": /^CEF:\d+/
+		};
+
+		var DOPS = {
+			cef: true,
+			fields: true
 		};
 
 		function peek(arr) {
@@ -140,7 +145,9 @@
 			} else return true;
 		}
 
-		function parse(line) {
+		function parse(line, opts) {
+			opts = opts || DOPS;
+
 			var pri = line.match(RXS.pri);
 			var entry = {
 				originalMessage: line
@@ -283,14 +290,14 @@
 			}
 
 			// CEF Event message
-			if (RXS.cef.test(entry.message)) {
+			if (opts.cef !== false && RXS.cef.test(entry.message)) {
 				entry.type = "CEF";
 				var cef = CEF.parse(entry.message);
 				entry.cef = cef.headers;
 				entry.fields = cef.fields;
 			}
 			// Default syslog message
-			else {
+			else if (opts.fields !== false && entry.type != "UNKNOWN") {
 					// Message with fields
 					var fields = [];
 					entry.message.split(",").forEach(function (kv) {
@@ -306,9 +313,9 @@
 			return entry;
 		}
 
-		module.exports = function (line) {
+		module.exports = function (line, opts) {
 			try {
-				return parse(line);
+				return parse(line, opts);
 			} catch (err) {
 				return { err: err };
 			}
