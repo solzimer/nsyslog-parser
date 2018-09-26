@@ -18,6 +18,10 @@ Although thought as a parser for stantard syslog messages, there are too many sy
 
 ## Usage
 
+```
+parser(line,options)
+```
+
 ```javascript
 const parser = require("nsyslog-parser");
 
@@ -130,3 +134,10 @@ console.log(parser(cefLine);
 	header: 'Jan 18 11:07:53 dsmhost '
 }
 ```
+
+## Options
+
+Options is a javascript object with the following parameters:
+* cef : Parse CEF strcuture (*true* by default)
+* fields : Parse Syslog structured data (*true* by default)
+* pid : Separate the PID field in case the **app** header field has the **app[pid]** format (true by default)

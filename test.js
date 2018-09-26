@@ -3,7 +3,7 @@ const parser = require("./parser.js");
 const COUNT = 50000;
 const MSGS = require("./test/examples.js");
 
-MSGS.map(parser).forEach(e=>console.log(e));
+MSGS.map(m=>parser(m,null)).forEach(e=>console.log(e));
 
 var s = Date.now();
 var i=0,j=0;

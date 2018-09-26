@@ -126,7 +126,8 @@
 
 		var DOPS = {
 			cef: true,
-			fields: true
+			fields: true,
+			pid: true
 		};
 
 		function peek(arr) {
@@ -309,6 +310,15 @@
 
 			// header
 			entry.header = line.substring(0, line.length - entry.message.length);
+
+			// PID
+			if (opts.pid && entry.appName && entry.appName.endsWith("]")) {
+				var _idx = entry.appName.indexOf("[");
+				if (_idx >= 0) {
+					entry.pid = entry.appName.substring(_idx + 1, entry.appName.length - 1);
+					entry.appName = entry.appName.substring(0, _idx);
+				}
+			}
 
 			return entry;
 		}

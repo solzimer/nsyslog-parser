@@ -17,7 +17,8 @@ const RXS = {
 
 const DOPS = {
 	cef : true,
-	fields : true
+	fields : true,
+	pid : true
 }
 
 function peek(arr) {
@@ -216,6 +217,15 @@ function parse(line,opts) {
 
 	// header
 	entry.header = line.substring(0,line.length-entry.message.length);
+
+	// PID
+	if(opts.pid && entry.appName && entry.appName.endsWith("]")) {
+		let idx = entry.appName.indexOf("[");
+		if(idx>=0) {
+			entry.pid = entry.appName.substring(idx+1,entry.appName.length-1);
+			entry.appName = entry.appName.substring(0,idx);
+		}
+	}
 
 	return entry;
 }
