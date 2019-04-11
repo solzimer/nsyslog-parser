@@ -50,33 +50,34 @@ function splitHeaders(text) {
 	return map;
 }
 
-function splitFields(txt) {
-	var tokens = [], map = {};
-	var res = null;
+function splitFields(msg) {
+	let tokens = msg.split(" ");
+	let map = {};
 
-	do {
-		res = FRX.exec(txt);
-		if(res) {
-			var tok = res[0];
-			var idx = res.index;
-			if(tokens.length) {
-				tokens[tokens.length-1] += txt.substring(0,idx);
+	let token = null;
+	while(tokens.length) {
+		if(!token) {
+			token = tokens.shift();
+			if(token.indexOf('=')>=0) {
+				let kv = token.split("=");
+				token = kv[0];
+				map[token] = kv[1];
 			}
-			tokens.push(tok);
-			txt = txt.substring(idx+tok.length);
+			else {
+				map[token] = "";
+			}
 		}
-		else if(txt.length && tokens.length) {
-			tokens[tokens.length-1] += txt;
-			txt = "";
+		else {
+			let val = tokens.shift();
+			if(val.indexOf('=')<0) {
+				map[token] += ` ${val}`;
+			}
+			else {
+				token = null;
+				tokens.unshift(val);
+			}
 		}
-	}while(res && txt.length);
-
-	tokens.map(t=>t.trim()).map(t=>{
-		t = t.split("=");
-		return {k:t.shift(), v:t.join("=")}
-	}).forEach(t=>{
-		map[t.k] = t.v;
-	});
+	}
 
 	return map;
 }

@@ -64,35 +64,31 @@
 			return map;
 		}
 
-		function splitFields(txt) {
-			var tokens = [],
-			    map = {};
-			var res = null;
+		function splitFields(msg) {
+			var tokens = msg.split(" ");
+			var map = {};
 
-			do {
-				res = FRX.exec(txt);
-				if (res) {
-					var tok = res[0];
-					var idx = res.index;
-					if (tokens.length) {
-						tokens[tokens.length - 1] += txt.substring(0, idx);
+			var token = null;
+			while (tokens.length) {
+				if (!token) {
+					token = tokens.shift();
+					if (token.indexOf('=') >= 0) {
+						var kv = token.split("=");
+						token = kv[0];
+						map[token] = kv[1];
+					} else {
+						map[token] = "";
 					}
-					tokens.push(tok);
-					txt = txt.substring(idx + tok.length);
-				} else if (txt.length && tokens.length) {
-					tokens[tokens.length - 1] += txt;
-					txt = "";
+				} else {
+					var val = tokens.shift();
+					if (val.indexOf('=') < 0) {
+						map[token] += " " + val;
+					} else {
+						token = null;
+						tokens.unshift(val);
+					}
 				}
-			} while (res && txt.length);
-
-			tokens.map(function (t) {
-				return t.trim();
-			}).map(function (t) {
-				t = t.split("=");
-				return { k: t.shift(), v: t.join("=") };
-			}).forEach(function (t) {
-				map[t.k] = t.v;
-			});
+			}
 
 			return map;
 		}
