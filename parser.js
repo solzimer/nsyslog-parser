@@ -18,7 +18,8 @@ const RXS = {
 const DOPS = {
 	cef : true,
 	fields : true,
-	pid : true
+	pid : true,
+	generateTimestamp: true
 }
 
 function peek(arr) {
@@ -100,7 +101,7 @@ function parse(line,opts) {
 	}
 
 	// No timestamp
-	if(!entry.ts) entry.ts = new Date();
+	if(!entry.ts && opts.generateTimestamp) entry.ts = new Date();
 
 	// Is a standard syslog message
 	if(entry.type) {
