@@ -141,3 +141,4 @@ Options is a javascript object with the following parameters:
 * cef : Parse CEF strcuture (*true* by default)
 * fields : Parse Syslog structured data (*true* by default)
 * pid : Separate the PID field in case the **app** header field has the **app[pid]** format (true by default)
+*	generateTimestamp: If *true* and no timestamp can be parsed from the line, sets the current timestamp. Otherwise, leave the field as *undefined* (*true* by default)
