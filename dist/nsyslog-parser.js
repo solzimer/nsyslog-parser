@@ -145,7 +145,8 @@
     var DOPS = {
       cef: true,
       fields: true,
-      pid: true
+      pid: true,
+      generateTimestamp: true
     };
 
     function peek(arr) {
@@ -165,7 +166,7 @@
     }
 
     function parse(line, opts) {
-      opts = opts || DOPS;
+      if (opts) opts = Object.assign({}, DOPS, opts);else opts = DOPS;
       var pri = line.match(RXS.pri);
       var entry = {
         originalMessage: line
@@ -217,7 +218,7 @@
       } // No timestamp
 
 
-      if (!entry.ts) entry.ts = new Date(); // Is a standard syslog message
+      if (!entry.ts && opts.generateTimestamp) entry.ts = new Date(); // Is a standard syslog message
 
       if (entry.type) {
         var invalidate = function invalidate(item) {

@@ -45,7 +45,10 @@ function assign(entry,item) {
 }
 
 function parse(line,opts) {
-	opts = opts || DOPS;
+	if(opts)
+		opts = Object.assign({},DOPS,opts);
+	else
+		opts = DOPS;
 
 	var pri = line.match(RXS.pri);
 	var entry = {
