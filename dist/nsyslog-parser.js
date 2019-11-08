@@ -140,6 +140,8 @@
       "ts": /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\S+ /,
       "invalid": /[^a-zA-Z0-9\.\$\-_#%\/\[\]\(\)]/,
       "sdata": /\[(\S+)( [^\=]+\=\"[^\"]+\")+\]/g,
+      "asdata": /^\s*[^\[]+\[/,
+      "bsdata": /^\s*\[/,
       "cef": /^CEF:\d+/
     };
     var DOPS = {
@@ -273,6 +275,9 @@
       entry.host = entry.chain.pop(); // Structured data
 
       if (entry.type == "RFC5424") {
+        // Look if sdata if before or after message
+        var bsdata = RXS.bsdata.test(entry.message);
+        var asdata = RXS.asdata.test(entry.message);
         var sdata = entry.message.match(RXS.sdata) || [];
         var idx = 0;
         entry.structuredData = sdata.map(function (item) {
@@ -302,8 +307,22 @@
               }
           });
           return map;
-        });
-        entry.message = entry.message.substring(idx);
+        }); // Structured data parsed successfuly
+
+        if (entry.structuredData.length) {
+          var sidx = entry.message.indexOf("["); // sdata before message
+
+          if (bsdata) {
+            if (sidx >= 0) entry.header = line.substring(0, line.length - entry.message.length);
+            entry.message = entry.message.substring(idx);
+          } // sdata after message
+          else if (asdata) {
+              if (sidx >= 0) {
+                entry.header = line.substring(0, line.length - entry.message.length);
+                entry.message = entry.message.substring(0, sidx);
+              }
+            }
+        }
       } // CEF Event message
 
 
@@ -324,7 +343,8 @@
         } // header
 
 
-      entry.header = line.substring(0, line.length - entry.message.length); // PID
+      entry.header = entry.header || line.substring(0, line.length - entry.message.length);
+      entry.message = entry.message.trim(); // PID
 
       if (opts.pid && entry.appName && entry.appName.endsWith("]")) {
         var _idx = entry.appName.indexOf("[");
