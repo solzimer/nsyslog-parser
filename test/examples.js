@@ -936,5 +936,35 @@ module.exports = [
   "chain": [],
   "header": "<35>0 2019-11-07T13:34:02+01:00 destmp.ICA.age Reverted - - - ",
   "fields": []
+},
+{
+  "originalMessage": "<36>0 2019-11-12T17:57:55+01:00 ICA.domini.age Unmanaged - - -  hosts discovered [alertMeta@0 oid=\"1.3.6.1.4.1.2213.84.2147483647.30\" shost=\"ICA.domini.age\" uid=\"ICA.domini.age\" domainTreePath=\"\" message=\"91 unmanaged host(s) discovered.\"]",
+  "pri": "<36>",
+  "prival": 36,
+  "facilityval": 4,
+  "levelval": 4,
+  "facility": "auth",
+  "level": "warn",
+  "version": 0,
+  "type": "RFC5424",
+  "ts": "2019-11-12T16:57:55.000Z",
+  "host": "ICA.domini.age",
+  "appName": "Unmanaged",
+  "pid": "-",
+  "messageid": "-",
+  "structuredData": [
+    {
+      "$id": "alertMeta@0",
+      "oid": "1.3.6.1.4.1.2213.84.2147483647.30",
+      "shost": "ICA.domini.age",
+      "uid": "ICA.domini.age",
+      "domainTreePath": "",
+      "message": "91 unmanaged host(s) discovered."
+    }
+  ],
+  "message": "hosts discovered",
+  "chain": [],
+  "header": "<36>0 2019-11-12T17:57:55+01:00 ICA.domini.age Unmanaged - - - ",
+  "fields": []
 }
 ];

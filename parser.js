@@ -11,7 +11,7 @@ const RXS = {
 	"time" : /^\d+:\d+:\d+ /,
 	"ts" : /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\S+ /,
 	"invalid" : /[^a-zA-Z0-9\.\$\-_#%\/\[\]\(\)]/,
-	"sdata" : /\[(\S+)( [^\=]+\=\"[^\"]+\")+\]/g,
+	"sdata" : /\[(\S+)( [^\=]+\=\"[^\"]*\")+\]/g,
 	"asdata" : /^\s*[^\[]+\[/,
 	"bsdata" : /^\s*\[/,
 	"cef" : /^CEF:\d+/
@@ -218,7 +218,7 @@ function parse(line,opts) {
 					entry.header = line.substring(0,line.length-entry.message.length);
 					entry.message = entry.message.substring(0,sidx);
 				}
-			}			
+			}
 		}
 	}
 
