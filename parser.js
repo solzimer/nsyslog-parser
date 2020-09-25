@@ -11,7 +11,9 @@ const RXS = {
 	"time" : /^\d+:\d+:\d+ /,
 	"ts" : /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\S+ /,
 	"invalid" : /[^a-zA-Z0-9\.\$\-_#%\/\[\]\(\)]/,
-	"sdata" : /\[(\S+)( [^\=]+\=\"[^\"]+\")+\]/g,
+	"sdata" : /\[(\S+)( [^\=]+\=\"[^\"]*\")+\]/g,
+	"asdata" : /^\s*[^\[]+\[/,
+	"bsdata" : /^\s*\[/,
 	"cef" : /^CEF:\d+/
 }
 
@@ -45,7 +47,10 @@ function assign(entry,item) {
 }
 
 function parse(line,opts) {
-	opts = opts || DOPS;
+	if(opts)
+		opts = Object.assign({},DOPS,opts);
+	else
+		opts = DOPS;
 
 	var pri = line.match(RXS.pri);
 	var entry = {
@@ -162,6 +167,10 @@ function parse(line,opts) {
 
 	// Structured data
 	if(entry.type=="RFC5424") {
+		// Look if sdata if before or after message
+		let bsdata = RXS.bsdata.test(entry.message);
+		let asdata = RXS.asdata.test(entry.message);
+
 		var sdata = entry.message.match(RXS.sdata) || [];
 		var idx=0;
 		entry.structuredData = sdata.map(item=>{
@@ -194,7 +203,23 @@ function parse(line,opts) {
 			});
 			return map;
 		});
-		entry.message = entry.message.substring(idx);
+
+		// Structured data parsed successfuly
+		if(entry.structuredData.length) {
+			let sidx = entry.message.indexOf("[");
+			// sdata before message
+			if(bsdata) {
+				if(sidx>=0) entry.header = line.substring(0,line.length-entry.message.length);
+				entry.message = entry.message.substring(idx);
+			}
+			// sdata after message
+			else if(asdata) {
+				if(sidx>=0) {
+					entry.header = line.substring(0,line.length-entry.message.length);
+					entry.message = entry.message.substring(0,sidx);
+				}
+			}
+		}
 	}
 
 	// CEF Event message
@@ -217,7 +242,8 @@ function parse(line,opts) {
 	}
 
 	// header
-	entry.header = line.substring(0,line.length-entry.message.length);
+	entry.header = entry.header || line.substring(0,line.length-entry.message.length);
+	entry.message = entry.message.trim();
 
 	// PID
 	if(opts.pid && entry.appName && entry.appName.endsWith("]")) {
