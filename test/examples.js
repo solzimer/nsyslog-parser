@@ -370,7 +370,7 @@ module.exports = [
     "deviceProduct": "threatmanager",
     "deviceVersion": "1.0",
     "deviceEventClassID": "100",
-    "name": "detected a \\| in message",
+    "name": "detected a | in message",
     "severity": "10",
     "extension": "src=10.0.0.1 act=blocked a | dst=1.1.1.1"
   },
@@ -382,13 +382,13 @@ module.exports = [
   "header": ""
 },
 {
-  "originalMessage": "Sep 19 08:26:10 host CEF:0|security|threatmanager|1.0|100|detected a \\ in packet|10|src=10.0.0.1 act=blocked a \\ dst=1.1.1.1",
+  "originalMessage": "Sep 19 08:26:10 host CEF:0|security|threatmanager|1.0|100|detected a \\\\ in packet|10|src=10.0.0.1 act=blocked a \\\\ dst=1.1.1.1",
   "pri": "",
   "prival": null,
   "type": "CEF",
   "ts": "2019-09-19T06:26:10.000Z",
   "host": "host",
-  "message": "CEF:0|security|threatmanager|1.0|100|detected a \\ in packet|10|src=10.0.0.1 act=blocked a \\ dst=1.1.1.1",
+  "message": "CEF:0|security|threatmanager|1.0|100|detected a \\\\ in packet|10|src=10.0.0.1 act=blocked a \\\\ dst=1.1.1.1",
   "chain": [],
   "cef": {
     "version": "CEF:0",
@@ -398,7 +398,7 @@ module.exports = [
     "deviceEventClassID": "100",
     "name": "detected a \\ in packet",
     "severity": "10",
-    "extension": "src=10.0.0.1 act=blocked a \\ dst=1.1.1.1"
+    "extension": "src=10.0.0.1 act=blocked a \\\\ dst=1.1.1.1"
   },
   "fields": {
     "src": "10.0.0.1",
@@ -428,8 +428,7 @@ module.exports = [
   },
   "fields": {
     "src": "10.0.0.1",
-    "act": "blocked a",
-    "\\": "",
+    "act": "blocked a =",
     "dst": "1.1.1.1"
   },
   "header": "Sep 19 08:26:10 host "
