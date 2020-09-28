@@ -1,13 +1,13 @@
 {
-  "name": "nsyslog-parser",
-  "version": "0.9.6",
-  "description": "Syslog Parser. Accepts RFC 3164 (BSD), RFC 5424 and CEF formats",
+  "name": "nsyslog-parser-2",
+  "version": "0.9.7",
+  "description": "Fork of David Gómez Matarrodona's Syslog Parser. Accepts RFC 3164 (BSD), RFC 5424 and CEF formats",
   "author": "David Gómez Matarrodona <solzimer@gmail.com>",
-  "url": "https://github.com/owner/project/issues",
+  "url": "https://github.com/hanvyj/nsyslog-parser",
   "email": "solzimer@gmail.com",
   "main": "parser.js",
   "license": "MIT",
-  "repository": "solzimer/nsyslog-parser",
+  "repository": "hanvyj/nsyslog-parser",
   "keywords": [
     "syslog",
     "parser",

@@ -80,6 +80,7 @@ function splitFields(msg) {
 			scape = true;
 		}
 		else if(ch==" ") {
+			scape = false;
 			curr += ch;
 			// reset the next possible key as we've seen a space
 			nextKey = "";
