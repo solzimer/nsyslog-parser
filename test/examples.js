@@ -408,6 +408,31 @@ module.exports = [
   "header": "Sep 19 08:26:10 host "
 },
 {
+  "originalMessage": "Sep 19 08:26:10 host CEF:0|security|threatmanager|1.0|100|Detected a threat. No action needed.|10|src=10.0.0.1 msg=Detected a threat.\\n No action needed.",
+  "pri": "",
+  "prival": null,
+  "type": "CEF",
+  "ts": "2019-09-19T06:26:10.000Z",
+  "host": "host",
+  "message": "CEF:0|security|threatmanager|1.0|100|Detected a threat. No action needed.|10|src=10.0.0.1 msg=Detected a threat.\\n No action needed.",
+  "chain": [],
+  "cef": {
+    "version": 'CEF:0',
+    "deviceVendor": 'security',
+    "deviceProduct": 'threatmanager',
+    "deviceVersion": '1.0',
+    "deviceEventClassID": '100',
+    "name": "Detected a threat. No action needed.",
+    "severity": "10",
+    "extension": "src=10.0.0.1 msg=Detected a threat.\\n No action needed."
+  },
+  "fields": {
+    "src": "10.0.0.1",
+    "msg": "Detected a threat.\n No action needed.",
+  },
+  "header": "Sep 19 08:26:10 host "
+},
+{
   "originalMessage": "Sep 19 08:26:10 host CEF:0|security|threatmanager|1.0|100|detected a = in message|10|src=10.0.0.1 act=blocked a \\= dst=1.1.1.1",
   "pri": "",
   "prival": null,

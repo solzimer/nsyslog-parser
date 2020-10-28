@@ -85,6 +85,14 @@ function splitFields(msg) {
 			// reset the next possible key as we've seen a space
 			nextKey = "";
 		}
+		else if(ch=="n" && scape) {
+			scape = false;
+			curr += "\n";
+		}
+		else if(ch=="r" && scape) {
+			scape = false;
+			curr += "\n";
+		}
 		else {
 			scape = false;
 			// add the character to the possible key and current value
