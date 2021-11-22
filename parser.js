@@ -1,6 +1,6 @@
-const
-	Pri = require("./pri.js"),
-	CEF = require("./cef.js");
+const Pri = require("./pri.js");
+const CEF = require("./cef.js");
+const { isValidTimeZone } = require("./isValidTimeZone.js");
 
 const RXS = {
 	"pri" : /^<\d+>/,
@@ -69,7 +69,7 @@ function parse(line,opts) {
 	}
 	else {
 		entry.pri = "";
-		entry.prival = NaN;
+		entry.prival = null;
 	}
 
 	//Split message
@@ -92,11 +92,22 @@ function parse(line,opts) {
 		// BSD
 		else if(item.match(RXS.month)) {
 			entry.type = "BSD";
-			var month = item.trim();
-			var day = peek(items);
-			var time = peek(items);
-			var year = new Date().getYear() + 1900
-			entry.ts = new Date(Date.parse(year+" "+month+" "+day+" "+time));
+			const month = item.trim();
+			const day = peek(items);
+			let time = peek(items);
+			let year = new Date().getYear() + 1900
+			let timezone = "";
+			// Check if the time is actually a year field and it is in the form "MMM dd yyyy HH:mm:ss"
+			if (time.length === 4 && !Number.isNaN(+time)) {
+				year = +time;
+				time = peek(items);
+			}
+			// Check if we have a timezone
+			if (isValidTimeZone(items[0].trim())) {
+				timezone = peek(items);
+			}
+
+			entry.ts = new Date(Date.parse(`${year} ${month} ${day} ${time} ${timezone}`.trim()));
 		}
 		else {
 			entry.type = "UNKNOWN";

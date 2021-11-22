@@ -1,5 +1,5 @@
 # nsyslog-parser
-[![](https://data.jsdelivr.com/v1/package/npm/nsyslog-parser/badge?style=rounded)](https://www.jsdelivr.com/package/npm/nsyslog-parser)
+This project was forked from the David Gómez Matarrodona's nsyslog-parser: [![](https://data.jsdelivr.com/v1/package/npm/nsyslog-parser/badge?style=rounded)](https://www.jsdelivr.com/package/npm/nsyslog-parser)
 
 Syslog Parser. Accepts [RFC 3164 (BSD)](https://tools.ietf.org/search/rfc3164), [RFC 5424](https://tools.ietf.org/html/rfc5424) and [CEF Common Event Format](https://community.saas.hpe.com/t5/ArcSight-Connectors/ArcSight-Common-Event-Format-CEF-Guide/ta-p/1589306) formats.
 Although thought as a parser for stantard syslog messages, there are too many systems/devices out there that sends erroneous, propietary or simply malformed messages. **nsyslog-parser** is flexible enough to try and parse every single message to extract as many information as possible, without throwing any errors.

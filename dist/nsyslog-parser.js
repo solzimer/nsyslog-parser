@@ -43,7 +43,7 @@
       $.NSyslog.parse = parser;
     })(window);
   }, {
-    "./parser.js": 3
+    "./parser.js": 4
   }],
   2: [function (require, module, exports) {
     var FRX = /[a-zA-Z][a-zA-Z0-9]+=/;
@@ -68,9 +68,8 @@
               curr = "";
               fields--;
             }
-          } else if (ch == "\\") {
-            curr += ch;
-            scape = !scape;
+          } else if (ch == "\\" && !scape) {
+            scape = true;
           } else {
             scape = false;
             curr += ch;
@@ -85,31 +84,53 @@
     }
 
     function splitFields(msg) {
-      var tokens = msg.split(" ");
       var map = {};
-      var token = null;
-
-      while (tokens.length) {
-        if (!token) {
-          token = tokens.shift();
-
-          if (token.indexOf('=') >= 0) {
-            var kv = token.split("=");
-            token = kv[0];
-            map[token] = kv[1];
+      var scape = false;
+      var key = "";
+      var nextKey = "";
+      var curr = "";
+      msg.split("").forEach(function (ch) {
+        if (ch == "=") {
+          if (scape) {
+            // Escape this = and treat it like any other character
+            scape = false;
+            curr += ch;
+            nextKey += ch;
           } else {
-            map[token] = "";
+            // The equals isn't escaped, so add the previous key value to the map
+            if (key) {
+              map[key] = curr.slice(0, curr.length - nextKey.length - 1);
+            } // Now prepare for the next key value
+
+
+            key = nextKey;
+            curr = "";
+            nextKey = "";
           }
+        } else if (ch == "\\" && !scape) {
+          // This is the escape character, so flag the next character to be escaped
+          scape = true;
+        } else if (ch == " ") {
+          scape = false;
+          curr += ch; // reset the next possible key as we've seen a space
+
+          nextKey = "";
+        } else if (ch == "n" && scape) {
+          scape = false;
+          curr += "\n";
+        } else if (ch == "r" && scape) {
+          scape = false;
+          curr += "\n";
         } else {
-          var val = tokens.shift();
+          scape = false; // add the character to the possible key and current value
 
-          if (val.indexOf('=') < 0) {
-            map[token] += " ".concat(val);
-          } else {
-            token = null;
-            tokens.unshift(val);
-          }
+          curr += ch;
+          nextKey += ch;
         }
+      });
+
+      if (key && curr) {
+        map[key] = curr;
       }
 
       return map;
@@ -127,8 +148,38 @@
     };
   }, {}],
   3: [function (require, module, exports) {
-    var Pri = require("./pri.js"),
-        CEF = require("./cef.js");
+    /**
+     * Checks if a string is a valid timezone or not
+     *
+     * @param {string} timezone the time zone string, e.g UTC or America/Los_Angeles
+     * @returns {boolean} if the timezone is valid
+     */
+    function isValidTimeZone(timezone) {
+      if (!Intl || !Intl.DateTimeFormat().resolvedOptions().timeZone) {
+        throw new Error("Time zones are not available in this environment");
+      }
+
+      try {
+        Intl.DateTimeFormat(undefined, {
+          timeZone: timezone
+        });
+        return true;
+      } catch (ex) {
+        return false;
+      }
+    }
+
+    module.exports = {
+      isValidTimeZone: isValidTimeZone
+    };
+  }, {}],
+  4: [function (require, module, exports) {
+    var Pri = require("./pri.js");
+
+    var CEF = require("./cef.js");
+
+    var _require = require("./isValidTimeZone.js"),
+        isValidTimeZone = _require.isValidTimeZone;
 
     var RXS = {
       "pri": /^<\d+>/,
@@ -184,7 +235,7 @@
         entry.level = Pri.LEVEL[prival.level].id;
       } else {
         entry.pri = "";
-        entry.prival = NaN;
+        entry.prival = null;
       } //Split message
 
 
@@ -210,7 +261,19 @@
             var day = peek(items);
             var time = peek(items);
             var year = new Date().getYear() + 1900;
-            entry.ts = new Date(Date.parse(year + " " + month + " " + day + " " + time));
+            var timezone = ""; // Check if the time is actually a year field and it is in the form "MMM dd yyyy HH:mm:ss"
+
+            if (time.length === 4 && !Number.isNaN(+time)) {
+              year = +time;
+              time = peek(items);
+            } // Check if we have a timezone
+
+
+            if (isValidTimeZone(items[0].trim())) {
+              timezone = peek(items);
+            }
+
+            entry.ts = new Date(Date.parse("".concat(year, " ").concat(month, " ").concat(day, " ").concat(time, " ").concat(timezone).trim()));
           } else {
             entry.type = "UNKNOWN";
             items.unshift(item.trim());
@@ -369,9 +432,10 @@
     };
   }, {
     "./cef.js": 2,
-    "./pri.js": 4
+    "./isValidTimeZone.js": 3,
+    "./pri.js": 5
   }],
-  4: [function (require, module, exports) {
+  5: [function (require, module, exports) {
     var FACILITY = [{
       id: "kern",
       label: "kernel messages"
