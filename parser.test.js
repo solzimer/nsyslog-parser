@@ -33,6 +33,24 @@ test.each([
   },
   {
     originalMessage:
+      "<34>OCT 11 22:14:15 mymachine su: 'su root' failed for lonvick on /dev/pts/8",
+    pri: "<34>",
+    prival: 34,
+    facilityval: 4,
+    levelval: 2,
+    facility: "auth",
+    level: "crit",
+    type: "BSD",
+    ts: dateAsCurrentYear("2019-10-11T21:14:15.000Z"),
+    host: "mymachine",
+    appName: "su",
+    message: "'su root' failed for lonvick on /dev/pts/8",
+    chain: [],
+    fields: [],
+    header: "<34>OCT 11 22:14:15 mymachine su: ",
+  },
+  {
+    originalMessage:
       "<34>Oct 11 22:14:15.123 UTC mymachine su: 'su root' failed for lonvick on /dev/pts/8",
     pri: "<34>",
     prival: 34,

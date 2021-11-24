@@ -185,8 +185,8 @@
       "pri": /^<\d+>/,
       "prinmr": /^\d+ /,
       "prival": /<(\d+)>/,
-      "month": /^[A-Za-z][a-z]{2} /,
-      "day": /^\d{1,2} /,
+      "month": /^[A-Za-z]{3} /,
+      "day": /^\d{1,2}/,
       "time": /^\d+:\d+:\d+ /,
       "ts": /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\S+ /,
       "invalid": /[^a-zA-Z0-9\.\$\-_#%\/\[\]\(\)]/,
@@ -201,14 +201,57 @@
       pid: true,
       generateTimestamp: true
     };
+    /**
+     * Removes the first non whitespace item from the array and returns the item
+     * @param {string[]} arr the array to shift the item from
+     * @returns the first non whitespace item of the array
+     */
 
-    function peek(arr) {
+    function shiftItem(arr) {
       do {
         var item = arr.shift();
         if (item === undefined) return item;else item = item.trim();
       } while (!item);
 
       return item;
+    }
+    /**
+     * Gets the first non whitespace item from the array without mutating the array
+     * @param {string[]} arr the array to peek for the first item
+     * @returns the first non whitespace item of the array
+     */
+
+
+    function peekItem(arr) {
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = arr[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var item = _step.value;
+          var trimmedItem = item.trim();
+
+          if (trimmedItem) {
+            return trimmedItem;
+          }
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+            _iterator["return"]();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      return undefined;
     }
 
     function assign(entry, item) {
@@ -244,33 +287,34 @@
       var endparse = false;
 
       while (line.length && !endparse) {
-        var item = peek(items) + " "; // RFC RFC5424
+        var item = shiftItem(items) + " ";
+        var nextItem = peekItem(items); // RFC RFC5424
 
         if (item.match(RXS.prinmr)) {
           entry.version = parseInt(item);
           entry.type = "RFC5424";
-          item = peek(items) + " ";
+          item = shiftItem(items) + " ";
 
           if (item.match(RXS.ts)) {
             entry.ts = new Date(Date.parse(item.match(RXS.ts)[0].trim()));
           }
         } // BSD
-        else if (item.match(RXS.month)) {
+        else if (item.match(RXS.month) && nextItem && nextItem.match(RXS.day)) {
             entry.type = "BSD";
             var month = item.trim();
-            var day = peek(items);
-            var time = peek(items);
+            var day = shiftItem(items);
+            var time = shiftItem(items);
             var year = new Date().getYear() + 1900;
             var timezone = ""; // Check if the time is actually a year field and it is in the form "MMM dd yyyy HH:mm:ss"
 
             if (time.length === 4 && !Number.isNaN(+time)) {
               year = +time;
-              time = peek(items);
+              time = shiftItem(items);
             } // Check if we have a timezone
 
 
             if (isValidTimeZone(items[0].trim())) {
-              timezone = peek(items);
+              timezone = shiftItem(items);
             }
 
             entry.ts = new Date(Date.parse("".concat(year, " ").concat(month, " ").concat(day, " ").concat(time, " ").concat(timezone).trim()));
@@ -295,7 +339,7 @@
         endparse = false;
 
         while (line.length && !endparse) {
-          var item = peek(items);
+          var item = shiftItem(items);
 
           if (!item) {
             endparse = true;
