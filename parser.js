@@ -1,13 +1,13 @@
-const
-	Pri = require("./pri.js"),
-	CEF = require("./cef.js");
+const Pri = require("./pri.js");
+const CEF = require("./cef.js");
+const { isValidTimeZone } = require("./isValidTimeZone.js");
 
 const RXS = {
 	"pri" : /^<\d+>/,
 	"prinmr" : /^\d+ /,
 	"prival" : /<(\d+)>/,
-	"month" : /^[A-Za-z][a-z]{2} /,
-	"day" : /^\d{1,2} /,
+	"month" : /^[A-Za-z]{3} /,
+	"day" : /^\d{1,2}/,
 	"time" : /^\d+:\d+:\d+ /,
 	"ts" : /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\S+ /,
 	"invalid" : /[^a-zA-Z0-9\.\$\-_#%\/\[\]\(\)]/,
@@ -24,7 +24,12 @@ const DOPS = {
 	generateTimestamp: true
 }
 
-function peek(arr) {
+/**
+ * Removes the first non whitespace item from the array and returns the item
+ * @param {string[]} arr the array to shift the item from
+ * @returns the first non whitespace item of the array
+ */
+function shiftItem(arr) {
 	do {
 		var item = arr.shift();
 		if(item===undefined) return item;
@@ -32,6 +37,21 @@ function peek(arr) {
 	}while(!item);
 
 	return item;
+}
+
+/**
+ * Gets the first non whitespace item from the array without mutating the array
+ * @param {string[]} arr the array to peek for the first item
+ * @returns the first non whitespace item of the array
+ */
+function peekItem(arr) {
+	for (const item of arr) {
+		let trimmedItem = item.trim();
+		if (trimmedItem) {
+			return trimmedItem;
+		}
+	}
+	return undefined;
 }
 
 function assign(entry,item) {
@@ -69,7 +89,7 @@ function parse(line,opts) {
 	}
 	else {
 		entry.pri = "";
-		entry.prival = NaN;
+		entry.prival = null;
 	}
 
 	//Split message
@@ -78,25 +98,37 @@ function parse(line,opts) {
 	// Date search
 	var endparse = false;
 	while(line.length && !endparse) {
-		var item = peek(items)+" ";
+		var item = shiftItem(items)+" ";
+		var nextItem = peekItem(items);
 
 		// RFC RFC5424
 		if(item.match(RXS.prinmr)) {
 			entry.version = parseInt(item);
 			entry.type = "RFC5424";
-			item = peek(items)+" ";
+			item = shiftItem(items)+" ";
 			if(item.match(RXS.ts)) {
 				entry.ts = new Date(Date.parse(item.match(RXS.ts)[0].trim()));
 			}
 		}
 		// BSD
-		else if(item.match(RXS.month)) {
+		else if(item.match(RXS.month) && nextItem && nextItem.match(RXS.day)) {
 			entry.type = "BSD";
-			var month = item.trim();
-			var day = peek(items);
-			var time = peek(items);
-			var year = new Date().getYear() + 1900
-			entry.ts = new Date(Date.parse(year+" "+month+" "+day+" "+time));
+			const month = item.trim();
+			const day = shiftItem(items);
+			let time = shiftItem(items);
+			let year = new Date().getYear() + 1900
+			let timezone = "";
+			// Check if the time is actually a year field and it is in the form "MMM dd yyyy HH:mm:ss"
+			if (time.length === 4 && !Number.isNaN(+time)) {
+				year = +time;
+				time = shiftItem(items);
+			}
+			// Check if we have a timezone
+			if (isValidTimeZone(items[0].trim())) {
+				timezone = shiftItem(items);
+			}
+
+			entry.ts = new Date(Date.parse(`${year} ${month} ${day} ${time} ${timezone}`.trim()));
 		}
 		else {
 			entry.type = "UNKNOWN";
@@ -119,7 +151,7 @@ function parse(line,opts) {
 		}
 
 		while(line.length && !endparse) {
-			var item = peek(items);
+			var item = shiftItem(items);
 			if(!item) {
 				endparse = true;
 			}
