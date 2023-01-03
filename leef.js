@@ -59,9 +59,8 @@ function splitFields(msg, delimiter) {
 	delimiter = delimiter || '\t';
 	let tokens = msg.split(delimiter);
 
-	console.log(tokens);
 	let map = tokens.reduce((map,token)=>{
-		keyval = token.split('=');
+		let keyval = token.split('=');
 		map[keyval[0]] = keyval[1];
 		return map;
 	},{});
