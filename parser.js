@@ -1,6 +1,7 @@
 const
 	Pri = require("./pri.js"),
-	CEF = require("./cef.js");
+	CEF = require("./cef.js"),
+	LEEF = require('./leef.js');
 
 const RXS = {
 	"pri" : /^<\d+>/,
@@ -14,11 +15,13 @@ const RXS = {
 	"sdata" : /\[(\S+)( [^\=]+\=\"[^\"]*\")+\]/g,
 	"asdata" : /^\s*[^\[]+\[/,
 	"bsdata" : /^\s*\[/,
-	"cef" : /^CEF:\d+/
+	"cef" : /^CEF:\d+/,
+	"leef" : /^LEEF:(1|2)\.0/
 }
 
 const DOPS = {
 	cef : true,
+	leef : true,
 	fields : true,
 	pid : true,
 	generateTimestamp: true
@@ -228,6 +231,13 @@ function parse(line,opts) {
 		let cef = CEF.parse(entry.message);
 		entry.cef = cef.headers;
 		entry.fields = cef.fields;
+	}
+	// LEEF Event message
+	else if(opts.leef!==false && RXS.leef.test(entry.message)) {
+		entry.type = "LEEF";
+		let leef = LEEF.parse(entry.message);
+		entry.leef = leef.headers;
+		entry.fields = leef.fields;
 	}
 	// Default syslog message
 	else if(opts.fields!==false && entry.type!="UNKNOWN"){

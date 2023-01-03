@@ -43,7 +43,7 @@
       $.NSyslog.parse = parser;
     })(window);
   }, {
-    "./parser.js": 3
+    "./parser.js": 4
   }],
   2: [function (require, module, exports) {
     var FRX = /[a-zA-Z][a-zA-Z0-9]+=/;
@@ -127,8 +127,104 @@
     };
   }, {}],
   3: [function (require, module, exports) {
+    var FRX = /[a-zA-Z][a-zA-Z0-9]+=/;
+    var LEEF_FIELDS = [{
+      k: "leefVersion",
+      v1: true,
+      v2: true
+    }, {
+      k: "vendor",
+      v1: true,
+      v2: true
+    }, {
+      k: "product",
+      v1: true,
+      v2: true
+    }, {
+      k: "version",
+      v1: true,
+      v2: true
+    }, {
+      k: "eventID",
+      v1: true,
+      v2: true
+    }, {
+      k: "delimiter",
+      v1: false,
+      v2: true
+    }, {
+      k: "extension",
+      v1: true,
+      v2: true
+    }];
+    var LLEN = LEEF_FIELDS.length;
+
+    function splitHeaders(text) {
+      var arr = [],
+          map = {};
+      var scape = false;
+      var fields = 7;
+      var curr = "";
+      text.split("").forEach(function (ch) {
+        if (!fields) {
+          curr += ch;
+        } else {
+          if (ch == "|") {
+            if (scape) {
+              scape = false;
+              curr += ch;
+            } else {
+              arr.push(curr);
+              curr = "";
+              fields--;
+            }
+          } else if (ch == "\\") {
+            curr += ch;
+            scape = !scape;
+          } else {
+            scape = false;
+            curr += ch;
+          }
+        }
+      });
+      if (curr.length) arr.push(curr);
+      var ver = arr[0] == 'LEEF:1.0' ? 'v1' : 'v2';
+
+      for (var i = 0; i < LLEN; i++) {
+        var f = LEEF_FIELDS[i];
+        if (f[ver]) map[f.k] = arr.shift();
+      }
+
+      return map;
+    }
+
+    function splitFields(msg, delimiter) {
+      delimiter = delimiter || '\t';
+      var tokens = msg.split(delimiter);
+      console.log(tokens);
+      var map = tokens.reduce(function (map, token) {
+        keyval = token.split('=');
+        map[keyval[0]] = keyval[1];
+        return map;
+      }, {});
+      return map;
+    }
+
+    module.exports = {
+      parse: function parse(text) {
+        var headers = splitHeaders(text);
+        var fields = splitFields(headers.extension || "", headers.delimiter);
+        return {
+          headers: headers,
+          fields: fields
+        };
+      }
+    };
+  }, {}],
+  4: [function (require, module, exports) {
     var Pri = require("./pri.js"),
-        CEF = require("./cef.js");
+        CEF = require("./cef.js"),
+        LEEF = require('./leef.js');
 
     var RXS = {
       "pri": /^<\d+>/,
@@ -142,10 +238,12 @@
       "sdata": /\[(\S+)( [^\=]+\=\"[^\"]*\")+\]/g,
       "asdata": /^\s*[^\[]+\[/,
       "bsdata": /^\s*\[/,
-      "cef": /^CEF:\d+/
+      "cef": /^CEF:\d+/,
+      "leef": /^LEEF:(1|2)\.0/
     };
     var DOPS = {
       cef: true,
+      leef: true,
       fields: true,
       pid: true,
       generateTimestamp: true
@@ -331,16 +429,22 @@
         var cef = CEF.parse(entry.message);
         entry.cef = cef.headers;
         entry.fields = cef.fields;
-      } // Default syslog message
-      else if (opts.fields !== false && entry.type != "UNKNOWN") {
-          // Message with fields
-          var fields = [];
-          entry.message.split(",").forEach(function (kv) {
-            var prop = kv.split("=");
-            if (prop.length == 2) fields[prop[0]] = prop[1];
-          });
-          entry.fields = fields;
-        } // header
+      } // LEEF Event message
+      else if (opts.leef !== false && RXS.leef.test(entry.message)) {
+          entry.type = "LEEF";
+          var leef = LEEF.parse(entry.message);
+          entry.leef = leef.headers;
+          entry.fields = leef.fields;
+        } // Default syslog message
+        else if (opts.fields !== false && entry.type != "UNKNOWN") {
+            // Message with fields
+            var fields = [];
+            entry.message.split(",").forEach(function (kv) {
+              var prop = kv.split("=");
+              if (prop.length == 2) fields[prop[0]] = prop[1];
+            });
+            entry.fields = fields;
+          } // header
 
 
       entry.header = entry.header || line.substring(0, line.length - entry.message.length);
@@ -369,9 +473,10 @@
     };
   }, {
     "./cef.js": 2,
-    "./pri.js": 4
+    "./leef.js": 3,
+    "./pri.js": 5
   }],
-  4: [function (require, module, exports) {
+  5: [function (require, module, exports) {
     var FACILITY = [{
       id: "kern",
       label: "kernel messages"
