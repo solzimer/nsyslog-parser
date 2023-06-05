@@ -197,96 +197,100 @@ function parse(line,opts) {
 	entry.chain = (entry.host||"").split("/");
 	entry.host = entry.chain.pop();
 
-	// Structured data
-	if(entry.type=="RFC5424") {
-		// Look if sdata if before or after message
-		let bsdata = RXS.bsdata.test(entry.message);
-		let asdata = RXS.asdata.test(entry.message);
+	if (entry.message !== undefined) {
+		// Structured data
+		if(entry.type=="RFC5424") {
+			// Look if sdata if before or after message
+			let bsdata = RXS.bsdata.test(entry.message);
+			let asdata = RXS.asdata.test(entry.message);
 
-		var sdata = entry.message.match(RXS.sdata) || [];
-		var idx=0;
-		entry.structuredData = sdata.map(item=>{
-			var map = {}, nokeys = [];
-			var lastKey = null;
-			idx = entry.message.indexOf(item)+item.length+1;
-			item.replace(/(^\[)|(\]$)/g,"").split(" ").forEach((t,i)=>{
-				// Extra space
-				if(!t.trim()) return;
-				// First element (ID of data)
-				if(i==0) {
-					map["$id"] = t;
-				}
-				// Key/Pair values
-				else {
-					var kv = t.split("=");
-					// Correct key/value pair
-					if(kv[0] && kv[1] && kv[1]!='"') {
-						lastKey = kv.shift();
-						map[lastKey] = kv.join("=").replace(/\"/g,"");
+			var sdata = entry.message.match(RXS.sdata) || [];
+			var idx=0;
+			entry.structuredData = sdata.map(item=>{
+				var map = {}, nokeys = [];
+				var lastKey = null;
+				idx = entry.message.indexOf(item)+item.length+1;
+				item.replace(/(^\[)|(\]$)/g,"").split(" ").forEach((t,i)=>{
+					// Extra space
+					if(!t.trim()) return;
+					// First element (ID of data)
+					if(i==0) {
+						map["$id"] = t;
 					}
-					// Last key had values separated by spaces
-					else if(kv[0] && kv[1]===undefined){
-						map[lastKey] += " "+(kv[0]||"").replace(/\"/g,"");
+					// Key/Pair values
+					else {
+						var kv = t.split("=");
+						// Correct key/value pair
+						if(kv[0] && kv[1] && kv[1]!='"') {
+							lastKey = kv.shift();
+							map[lastKey] = kv.join("=").replace(/\"/g,"");
+						}
+						// Last key had values separated by spaces
+						else if(kv[0] && kv[1]===undefined){
+							map[lastKey] += " "+(kv[0]||"").replace(/\"/g,"");
+						}
+						else if(kv[0] && (!kv[1].length || kv[1]=='"')){
+							map[lastKey] += " "+(kv[0]||"").replace(/\"/g,"")+"=";
+						}
 					}
-					else if(kv[0] && (!kv[1].length || kv[1]=='"')){
-						map[lastKey] += " "+(kv[0]||"").replace(/\"/g,"")+"=";
-					}
-				}
+				});
+				return map;
 			});
-			return map;
-		});
 
-		// Structured data parsed successfuly
-		if(entry.structuredData.length) {
-			let sidx = entry.message.indexOf("[");
-			// sdata before message
-			if(bsdata) {
-				if(sidx>=0) entry.header = line.substring(0,line.length-entry.message.length);
-				entry.message = entry.message.substring(idx);
-			}
-			// sdata after message
-			else if(asdata) {
-				if(sidx>=0) {
-					entry.header = line.substring(0,line.length-entry.message.length);
-					entry.message = entry.message.substring(0,sidx);
+			// Structured data parsed successfuly
+			if(entry.structuredData.length) {
+				let sidx = entry.message.indexOf("[");
+				// sdata before message
+				if(bsdata) {
+					if(sidx>=0) entry.header = line.substring(0,line.length-entry.message.length);
+					entry.message = entry.message.substring(idx);
+				}
+				// sdata after message
+				else if(asdata) {
+					if(sidx>=0) {
+						entry.header = line.substring(0,line.length-entry.message.length);
+						entry.message = entry.message.substring(0,sidx);
+					}
 				}
 			}
 		}
-	}
 
-	// CEF Event message
-	if(opts.cef!==false && RXS.cef.test(entry.message)) {
-		entry.type = "CEF";
-		let cef = CEF.parse(entry.message);
-		entry.cef = cef.headers;
-		entry.fields = cef.fields;
-	}
-	// Default syslog message
-	else if(opts.fields!==false && entry.type!="UNKNOWN"){
-		// Message with fields
-		var fields = [];
-		entry.message.split(",").forEach(kv=>{
-			var prop = kv.split("=");
-			if(prop.length==2)
-				fields[prop[0]] = prop[1];
-		});
-		entry.fields = fields;
-	}
-
-	// header
-	entry.header = entry.header || line.substring(0,line.length-entry.message.length);
-	entry.message = entry.message.trim();
-
-	// PID
-	if(opts.pid && entry.appName && entry.appName.endsWith("]")) {
-		let idx = entry.appName.indexOf("[");
-		if(idx>=0) {
-			entry.pid = entry.appName.substring(idx+1,entry.appName.length-1);
-			entry.appName = entry.appName.substring(0,idx);
+		// CEF Event message
+		if(opts.cef!==false && RXS.cef.test(entry.message)) {
+			entry.type = "CEF";
+			let cef = CEF.parse(entry.message);
+			entry.cef = cef.headers;
+			entry.fields = cef.fields;
 		}
+		// Default syslog message
+		else if(opts.fields!==false && entry.type!="UNKNOWN"){
+			// Message with fields
+			var fields = [];
+			entry.message.split(",").forEach(kv=>{
+				var prop = kv.split("=");
+				if(prop.length==2)
+					fields[prop[0]] = prop[1];
+			});
+			entry.fields = fields;
+		}
+
+		// header
+		entry.header = entry.header || line.substring(0,line.length-entry.message.length);
+		entry.message = entry.message.trim();
+
+		// PID
+		if(opts.pid && entry.appName && entry.appName.endsWith("]")) {
+			let idx = entry.appName.indexOf("[");
+			if(idx>=0) {
+				entry.pid = entry.appName.substring(idx+1,entry.appName.length-1);
+				entry.appName = entry.appName.substring(0,idx);
+			}
+		}
+	} else {
+		entry.type = "UNKNOWN"
 	}
 
 	return entry;
 }
 
-module.exports = function(line,opts) {try {return parse(line,opts)}catch(err){return {err:err}}};
+module.exports = function(line,opts) {try {return parse(line,opts)}catch(err){ console.log(err); return {err:err}}};
